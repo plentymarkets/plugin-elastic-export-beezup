@@ -1,0 +1,9 @@
+{
+  "name": "ElasticExportBeezUp",
+  "description": "This plugin adds the format BeezUp to the Elastic Export.",
+  "namespace": "ElasticExportBeezUp",
+  "author": "plentymarkets",
+  "type": "export",
+  "serviceProvider": "ElasticExportBeezUp\\ElasticExportBeezUpServiceProvider",
+  "version": 0.1
+}
