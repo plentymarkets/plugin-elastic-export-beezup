@@ -39,17 +39,14 @@ class BeezUp extends CSVGenerator
 
     /**
      * Geizhals constructor.
-     * @param ElasticExportCoreHelper $elasticExportHelper
      * @param ArrayHelper $arrayHelper
      * @param AttributeValueNameRepositoryContract $attributeValueNameRepository
      */
     public function __construct(
-        ElasticExportCoreHelper $elasticExportHelper,
         ArrayHelper $arrayHelper,
         AttributeValueNameRepositoryContract $attributeValueNameRepository
     )
     {
-        $this->elasticExportHelper = $elasticExportHelper;
         $this->arrayHelper = $arrayHelper;
         $this->attributeValueNameRepository = $attributeValueNameRepository;
     }
@@ -60,6 +57,7 @@ class BeezUp extends CSVGenerator
      */
     protected function generateContent($resultData, array $formatSettings = [])
     {
+        $this->elasticExportHelper = pluginApp(ElasticExportCoreHelper::class);
         if(is_array($resultData) && count($resultData['documents']) > 0)
         {
             $settings = $this->arrayHelper->buildMapFromObjectList($formatSettings, 'key', 'value');
