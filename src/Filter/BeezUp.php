@@ -2,11 +2,11 @@
 
 namespace ElasticExportBeezUp\Filter;
 
-use Plenty\Modules\DataExchange\Contracts\FiltersForElasticSearchContract;
+use Plenty\Modules\DataExchange\Contracts\FiltersForElasticSearch;
 use Plenty\Plugin\Application;
 
 
-class BeezUp extends FiltersForElasticSearchContract
+class BeezUp extends FiltersForElasticSearch
 {
     /**
      * @var Application $app

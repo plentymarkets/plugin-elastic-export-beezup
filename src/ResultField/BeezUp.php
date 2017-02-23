@@ -69,7 +69,10 @@ class BeezUp extends ResultFields
          * @var ImageMutator $imageMutator
          */
         $imageMutator = pluginApp(ImageMutator::class);
-        $imageMutator->addMarket($reference);
+        if($imageMutator instanceof ImageMutator)
+        {
+            $imageMutator->addMarket($reference);
+        }
         /**
          * @var LanguageMutator $languageMutator
          */
@@ -78,7 +81,10 @@ class BeezUp extends ResultFields
          * @var DefaultCategoryMutator $defaultCategoryMutator
          */
         $defaultCategoryMutator = pluginApp(DefaultCategoryMutator::class);
-        $defaultCategoryMutator->setPlentyId($settings->get('plentyId'));
+        if($defaultCategoryMutator instanceof DefaultCategoryMutator)
+        {
+            $defaultCategoryMutator->setPlentyId($settings->get('plentyId'));
+        }
 
         $fields = [
             [
