@@ -18,7 +18,6 @@ class ElasticExportBeezUpServiceProvider extends DataExchangeServiceProvider
             'BeezUp-Plugin',
             'ElasticExportBeezUp\ResultField\BeezUp',
             'ElasticExportBeezUp\Generator\BeezUp',
-            'ElasticExportBeezUp\Filter\BeezUp',
             true
         );
     }
