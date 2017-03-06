@@ -11,10 +11,11 @@ use ElasticExport\Helper\ElasticExportCoreHelper;
 use Plenty\Modules\Helper\Models\KeyValue;
 use Plenty\Modules\Item\Attribute\Contracts\AttributeValueNameRepositoryContract;
 use Plenty\Modules\Item\Attribute\Models\AttributeValueName;
+use Plenty\Modules\Item\Property\Contracts\PropertyNameRepositoryContract;
+use Plenty\Modules\Item\Property\Models\PropertyName;
 
 class BeezUp extends CSVPluginGenerator
 {
-
     const PROPERTY_TYPE_DESCRIPTION = 'description';
 
     /**
@@ -36,6 +37,11 @@ class BeezUp extends CSVPluginGenerator
      * @var array $idlVariations
      */
     private $idlVariations = array();
+
+	/**
+	 * @var array $propertyData
+	 */
+    private $propertyData = [];
 
     /**
      * Geizhals constructor.
@@ -62,10 +68,8 @@ class BeezUp extends CSVPluginGenerator
         if(is_array($resultData['documents']) && count($resultData['documents']) > 0)
         {
             $settings = $this->arrayHelper->buildMapFromObjectList($formatSettings, 'key', 'value');
-
             $this->setDelimiter(";");
-
-            $this->addCSVContent([
+            $csvHeader = [
                 'Produkt ID',
                 'Artikel Nr',
                 'MPN',
@@ -96,9 +100,9 @@ class BeezUp extends CSVPluginGenerator
                 'Gewicht',
                 'Grundpreis',
                 'ID'
-            ]);
+            ];
 
-            $variationIdList = array();
+            $variationIdList = $additionalHeaders = [];
             foreach($resultData['documents'] as $variation)
             {
                 $variationIdList[] = $variation['id'];
@@ -118,7 +122,14 @@ class BeezUp extends CSVPluginGenerator
             if(isset($idlResultList) && $idlResultList instanceof RecordList)
             {
                 $this->createIdlArray($idlResultList);
+
+				// extend header by properties
+				$additionalHeaders = $this->buildPropertyData($idlResultList);
             }
+
+			// combine hard coded headers with property based headers
+			$csvHeader = array_merge($csvHeader, $additionalHeaders);
+			$this->addCSVContent($csvHeader);
 
             foreach($resultData['documents'] as $item)
             {
@@ -172,6 +183,8 @@ class BeezUp extends CSVPluginGenerator
                     'Grundpreis'            =>  $this->elasticExportHelper->getBasePrice($item, $this->idlVariations[$item['id']]),
                     'ID'                    =>  $item['data']['item']['id'],
                 ];
+
+				$data = $this->addPropertyData($data, $item['data']['variation']['id']);
 
                 $this->addCSVContent(array_values($data));
             }
@@ -321,4 +334,68 @@ class BeezUp extends CSVPluginGenerator
             }
         }
     }
+
+	/**
+	 * Returns a list of additional header for the CSV based on
+	 * the configured properties and builds also the property data for
+	 * further usage.
+	 *
+	 * @param RecordList $idLResultList
+	 * @return array
+	 */
+    private function buildPropertyData($idLResultList):array
+	{
+		/**
+		 * @var PropertyNameRepositoryContract $propertyNameRepository
+		 */
+		$propertyNameRepository = pluginApp(PropertyNameRepositoryContract::class);
+		$header = [];
+
+		if(!$propertyNameRepository instanceof PropertyNameRepositoryContract)
+		{
+			return [];
+		}
+
+		/**
+		 * @var RecordList $variation
+		 */
+		foreach($idLResultList as $variation)
+		{
+			foreach($variation->itemPropertyList as $property)
+			{
+				$propertyName = $propertyNameRepository->findOne($property->propertyId, 'de');
+
+				if(!($propertyName instanceof PropertyName) || is_null($propertyName))
+				{
+					continue;
+				}
+
+				$header[] = $propertyName->name;
+				$this->propertyData[$variation->variationBase->id][$propertyName->name][$property->propertyValue];
+			}
+		}
+
+		return $header;
+	}
+
+	/**
+	 * Adds the data of the properties to the existing data array.
+	 * The header of $data has to be extended before.
+	 *
+	 * @param array $data
+	 * @param int $variationId
+	 * @return array
+	 */
+	private function addPropertyData($data, $variationId):array
+	{
+		foreach($this->propertyData[$variationId] as $name => $value)
+		{
+			if(array_key_exists($name, $data))
+			{
+				$data[$name] = $value;
+			}
+		}
+
+		return $data;
+	}
 }
