@@ -1,4 +1,4 @@
-plentymarkets plugin Elastic Export BeezUp
+plentymarkets plugin ElasticExportBeezUp
 
 Copyright © 2016 plentymarkets GmbH
 
