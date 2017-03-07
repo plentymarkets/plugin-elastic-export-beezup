@@ -1,5 +1,5 @@
 
-# User Guide für das Elastic Export BeezUp Plugin
+# User Guide für das ElasticExportBeezUp Plugin
 
 <div class="container-toc"></div>
 
@@ -9,7 +9,7 @@ BeezUP ist ein Tool zur Verwaltung und Optimierung der Präsentation Ihrer Artik
 
 ## Elastic Export BeezUp-Plugin in plentymarkets einrichten
 
-Nachdem Sie das Elastic Export BeezUp Plugin im plentyMarketplace gekauft haben, richten Sie das Exportformat wie auf der Handbuchseite [Daten exportieren](https://www.plentymarkets.eu/handbuch/datenaustausch/daten-exportieren/#4) beschrieben ein.
+Nachdem Sie das ElasticExportBeezUp Plugin im plentyMarketplace gekauft haben, richten Sie das Exportformat wie auf der Handbuchseite [Daten exportieren](https://www.plentymarkets.eu/handbuch/datenaustausch/daten-exportieren/#4) beschrieben ein.
 
 ## Lizenz
 
