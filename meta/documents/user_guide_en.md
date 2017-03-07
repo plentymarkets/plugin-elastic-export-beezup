@@ -1,5 +1,5 @@
 
-# BeezUp plugin user guide
+# ElasticExportBeezUp plugin user guide
 
 <div class="container-toc"></div>
 
@@ -9,7 +9,7 @@ BeezUP helps you to manage and optimize the presentation of your items in price 
 
 ## Setting up the data format BeezUp-Plugin in plentymarkets
 
-Follow the instructions given on the [Exporting data](https://www.plentymarkets.co.uk/manual/data-exchange/exporting-data/#4) page of the manual to set up BeezUp in plentymarkets.
+Follow the instructions given on the [Exporting data](https://www.plentymarkets.co.uk/manual/data-exchange/exporting-data/#4) page of the manual to set up the data format BeezUp-Plugin in plentymarkets.
 
 ## License
 
