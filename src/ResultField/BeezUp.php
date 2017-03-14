@@ -122,11 +122,15 @@ class BeezUp extends ResultFields
             ],
 
             [
-                $imageMutator,
                 $languageMutator,
                 $defaultCategoryMutator
             ],
         ];
+
+        if($reference != -1)
+        {
+            $fields[1][] = $imageMutator;
+        }
 
         foreach($itemDescriptionFields as $itemDescriptionField)
         {
