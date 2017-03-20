@@ -138,7 +138,7 @@ class BeezUp extends CSVPluginGenerator
 				$variationAttributes = $this->getVariationAttributes($item, $settings);
 
 				$stockList = $this->getStockList($item);
-				$price = $this->idlVariations[$item['id']];
+				$price = $this->idlVariations[$item['id']]['variationRetailPrice.price'];
 				$rrp = $this->elasticExportHelper->getRecommendedRetailPrice($this->idlVariations[$item['id']]['variationRecommendedRetailPrice.price'], $settings);
 				$rrp = ($price > $rrp) ? $price : $rrp;
 
@@ -164,11 +164,11 @@ class BeezUp extends CSVPluginGenerator
 					'Preis inkl. MwSt.'     =>  number_format((float)$price, 2, '.', ''),
 					'UVP inkl. MwSt.'       =>  number_format((float)$rrp, 2, '.', ''),
 					'Produkt-URL'           =>  $this->elasticExportHelper->getUrl($item, $settings),
-					'Bild-URL'              =>  $this->getImageByNumber($item, $settings, 1),
-					'Bild-URL2'             =>  $this->getImageByNumber($item, $settings, 2),
-					'Bild-URL3'             =>  $this->getImageByNumber($item, $settings, 3),
-					'Bild-URL4'             =>  $this->getImageByNumber($item, $settings, 4),
-					'Bild-URL5'             =>  $this->getImageByNumber($item, $settings, 5),
+					'Bild-URL'              =>  $this->getImageByNumber($item, $settings, 0),
+					'Bild-URL2'             =>  $this->getImageByNumber($item, $settings, 1),
+					'Bild-URL3'             =>  $this->getImageByNumber($item, $settings, 2),
+					'Bild-URL4'             =>  $this->getImageByNumber($item, $settings, 3),
+					'Bild-URL5'             =>  $this->getImageByNumber($item, $settings, 4),
 					'Lieferkosten'          =>  $shippingCost,
 					'Auf Lager'             =>  $stockList['variationAvailable'],
 					'Lagerbestand'          =>  $stockList['stock'],

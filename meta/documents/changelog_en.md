@@ -1,5 +1,11 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.0.3 (2017-03-20)
+
+### Fixed
+- Fixed the price and how it was exported.
+- Adjusted the load image function.
+
 ## v1.0.2 (2017-03-13)
 
 ### Added
