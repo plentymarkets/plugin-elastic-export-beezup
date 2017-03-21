@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.0.4 (2017-03-21)
+
+### Fixed
+- Fixed the recommended retail price and how it was exported.
+
 ## v1.0.3 (2017-03-20)
 
 ### Fixed

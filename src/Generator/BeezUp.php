@@ -138,10 +138,13 @@ class BeezUp extends CSVPluginGenerator
 				$variationAttributes = $this->getVariationAttributes($item, $settings);
 
 				$stockList = $this->getStockList($item);
+
+                // Get and set the price and rrp
 				$price = $this->idlVariations[$item['id']]['variationRetailPrice.price'];
 				$rrp = $this->elasticExportHelper->getRecommendedRetailPrice($this->idlVariations[$item['id']]['variationRecommendedRetailPrice.price'], $settings);
-				$rrp = ($price > $rrp) ? $price : $rrp;
+				$rrp = ($price >= $rrp) ? 0 : $rrp;
 
+                // Get shipping costs
 				$shippingCost = $this->elasticExportHelper->getShippingCost($item['data']['item']['id'], $settings);
 
 				if(!is_null($shippingCost))

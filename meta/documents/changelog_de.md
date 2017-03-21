@@ -1,5 +1,10 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.0.4 (2017-03-21)
+
+### Behoben
+- Der UVP-Preis wurde nicht korrekt exportiert.
+
 ## v1.0.3 (2017-03-20)
 
 ### Behoben
