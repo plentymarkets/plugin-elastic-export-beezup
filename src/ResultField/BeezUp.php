@@ -108,12 +108,14 @@ class BeezUp extends ResultFields
                 'images.item.urlSecondPreview',
                 'images.item.url',
                 'images.item.position',
+                'images.item.path',
 
                 'images.variation.urlMiddle',
                 'images.variation.urlPreview',
                 'images.variation.urlSecondPreview',
                 'images.variation.url',
                 'images.variation.position',
+                'images.variation.path',
 
                 //defaultCategories
                 'defaultCategories.id',

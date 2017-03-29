@@ -1,5 +1,10 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.0.6 (2017-03-29)
+
+### Behoben
+- Es wurde ein Fehler behoben der dazu geführt hat das die Bild-Daten nicht geladen werden konnten.
+
 ## v1.0.5 (2017-03-22)
 
 ### Behoben

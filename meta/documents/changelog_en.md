@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.0.6 (2017-03-29)
+
+### Fixed
+- The image-data will now be received properly.
+
 ## v1.0.5 (2017-03-22)
 
 ### Fixed
