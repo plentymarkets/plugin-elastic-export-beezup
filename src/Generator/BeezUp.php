@@ -291,7 +291,7 @@ class BeezUp extends CSVPluginGenerator
         if($stockRepositoryContract instanceof StockRepositoryContract)
         {
             $stockRepositoryContract->setFilters(['variationId' => $item['id']]);
-            $stockResult = $stockRepositoryContract->listStock(['stockNet'],1,1);
+            $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
             $stockNet = $stockResult->getResult()->first()->stockNet;
         }
 		
