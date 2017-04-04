@@ -15,9 +15,12 @@ use Plenty\Modules\Item\Property\Models\PropertyName;
 use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchScrollRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 class BeezUp extends CSVPluginGenerator
 {
+    use Loggable;
+
 	const MARKET_REFERENCE_BEEZUP = 127.00;
 	const PROPERTY_TYPE_DESCRIPTION = 'description';
     const TRANSFER_RRP_YES = 1;
@@ -130,62 +133,73 @@ class BeezUp extends CSVPluginGenerator
 
                     foreach($resultList['documents'] as $item)
                     {
-                        $variationAttributes = $this->getVariationAttributes($item, $settings);
-
-                        $stockList = $this->getStockList($item);
-                        $priceList = $this->getPriceList($item, $settings);
-
-                        // Get shipping costs
-                        $shippingCost = $this->elasticExportHelper->getShippingCost($item['data']['item']['id'], $settings);
-
-                        if(!is_null($shippingCost))
+                        try
                         {
-                            $shippingCost = number_format((float)$shippingCost, 2, ',', '');
+                            $variationAttributes = $this->getVariationAttributes($item, $settings);
+
+                            $stockList = $this->getStockList($item);
+                            $priceList = $this->getPriceList($item, $settings);
+
+                            // Get shipping costs
+                            $shippingCost = $this->elasticExportHelper->getShippingCost($item['data']['item']['id'], $settings);
+
+                            if(!is_null($shippingCost))
+                            {
+                                $shippingCost = number_format((float)$shippingCost, 2, ',', '');
+                            }
+                            else
+                            {
+                                $shippingCost = '';
+                            }
+
+                            $data = [
+                                'Produkt ID'            =>  $item['id'],
+                                'Artikel Nr'            =>  $item['data']['variation']['number'],
+                                'MPN'                   =>  $item['data']['variation']['model'],
+                                'EAN'                   =>  $this->elasticExportHelper->getBarcodeByType($item, $settings->get('barcode')),
+                                'Marke'                 =>  $this->elasticExportHelper->getExternalManufacturerName((int)$item['data']['item']['manufacturer']['id']),
+                                'Produktname'           =>  $this->elasticExportHelper->getName($item, $settings, 256),
+                                'Produktbeschreibung'   =>  $this->getDescription($item, $settings),
+                                'Preis inkl. MwSt.'     =>  number_format((float)$priceList['variationRetailPrice.price'], 2, '.', ''),
+                                'UVP inkl. MwSt.'       =>  $priceList['reducedPrice'] > 0 ?
+                                    number_format((float)$priceList['reducedPrice'], 2, '.', '') : '',
+                                'Produkt-URL'           =>  $this->elasticExportHelper->getUrl($item, $settings),
+                                'Bild-URL'              =>  $this->getImageByNumber($item, $settings, 0),
+                                'Bild-URL2'             =>  $this->getImageByNumber($item, $settings, 1),
+                                'Bild-URL3'             =>  $this->getImageByNumber($item, $settings, 2),
+                                'Bild-URL4'             =>  $this->getImageByNumber($item, $settings, 3),
+                                'Bild-URL5'             =>  $this->getImageByNumber($item, $settings, 4),
+                                'Lieferkosten'          =>  $shippingCost,
+                                'Auf Lager'             =>  $stockList['variationAvailable'],
+                                'Lagerbestand'          =>  $stockList['stock'],
+                                'Lieferfrist'           =>  $this->elasticExportHelper->getAvailability($item, $settings, false),
+                                'Kategorie 1'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 1),
+                                'Kategorie 2'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 2),
+                                'Kategorie 3'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 3),
+                                'Kategorie 4'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 4),
+                                'Kategorie 5'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 5),
+                                'Kategorie 6'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 6),
+                                'Farbe'                 =>  $variationAttributes['Color'],
+                                'Größe'                 =>  $variationAttributes['Size'],
+                                'Gewicht'               =>  $item['data']['variation']['weightG'],
+                                'Grundpreis'            =>  $this->elasticExportHelper->getBasePrice($item, $priceList),
+                                'ID'                    =>  $item['data']['item']['id'],
+                            ];
+
+                            $data = $this->addPropertyData($data, $item['id']);
+
+                            $this->addCSVContent(array_values($data));
+
+                            $lines = $lines +1;
                         }
-                        else
+                        catch(\Throwable $throwable)
                         {
-                            $shippingCost = '';
+                            $this->getLogger(__METHOD__)->error('ElasticExportBeezUp::logs.fillRowError', [
+                                'Error message ' => $throwable->getMessage(),
+                                'Error line'    => $throwable->getLine(),
+                                'VariationId'   => $item['id']
+                            ]);
                         }
-
-                        $data = [
-                            'Produkt ID'            =>  $item['id'],
-                            'Artikel Nr'            =>  $item['data']['variation']['number'],
-                            'MPN'                   =>  $item['data']['variation']['model'],
-                            'EAN'                   =>  $this->elasticExportHelper->getBarcodeByType($item, $settings->get('barcode')),
-                            'Marke'                 =>  $this->elasticExportHelper->getExternalManufacturerName((int)$item['data']['item']['manufacturer']['id']),
-                            'Produktname'           =>  $this->elasticExportHelper->getName($item, $settings, 256),
-                            'Produktbeschreibung'   =>  $this->getDescription($item, $settings),
-                            'Preis inkl. MwSt.'     =>  number_format((float)$priceList['variationRetailPrice.price'], 2, '.', ''),
-                            'UVP inkl. MwSt.'       =>  $priceList['reducedPrice'] > 0 ?
-                                number_format((float)$priceList['reducedPrice'], 2, '.', '') : '',
-                            'Produkt-URL'           =>  $this->elasticExportHelper->getUrl($item, $settings),
-                            'Bild-URL'              =>  $this->getImageByNumber($item, $settings, 0),
-                            'Bild-URL2'             =>  $this->getImageByNumber($item, $settings, 1),
-                            'Bild-URL3'             =>  $this->getImageByNumber($item, $settings, 2),
-                            'Bild-URL4'             =>  $this->getImageByNumber($item, $settings, 3),
-                            'Bild-URL5'             =>  $this->getImageByNumber($item, $settings, 4),
-                            'Lieferkosten'          =>  $shippingCost,
-                            'Auf Lager'             =>  $stockList['variationAvailable'],
-                            'Lagerbestand'          =>  $stockList['stock'],
-                            'Lieferfrist'           =>  $this->elasticExportHelper->getAvailability($item, $settings, false),
-                            'Kategorie 1'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 1),
-                            'Kategorie 2'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 2),
-                            'Kategorie 3'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 3),
-                            'Kategorie 4'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 4),
-                            'Kategorie 5'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 5),
-                            'Kategorie 6'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 6),
-                            'Farbe'                 =>  $variationAttributes['Color'],
-                            'Größe'                 =>  $variationAttributes['Size'],
-                            'Gewicht'               =>  $item['data']['variation']['weightG'],
-                            'Grundpreis'            =>  $this->elasticExportHelper->getBasePrice($item, $priceList),
-                            'ID'                    =>  $item['data']['item']['id'],
-                        ];
-
-                        $data = $this->addPropertyData($data, $item['id']);
-
-                        $this->addCSVContent(array_values($data));
-
-                        $lines = $lines +1;
                     }
                 }
             }while ($elasticSearch->hasNext());
