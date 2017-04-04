@@ -3,7 +3,7 @@
 ## v1.0.7 (2017-04-04)
 
 ### Hinzugefügt
-- Es wurde ein neuer Mutator hinzugefügt, welcher verhindern soll das auf nicht existente Arraykeys zugegeriffen werden.
+- Es wurde ein neuer Mutator hinzugefügt, welcher verhindern soll das auf nicht existente Arraykeys zugegeriffen wird.
 
 ### Geändert
 - Es wurde die Performance verbessert.
