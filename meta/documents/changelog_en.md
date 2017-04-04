@@ -1,5 +1,13 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.0.7 (2017-04-04)
+
+### Added
+- Added a new mutator so we will prevent trying to get access to an array key which not exists.
+
+### Changed
+- Performance has been improved.
+
 ## v1.0.6 (2017-03-29)
 
 ### Fixed

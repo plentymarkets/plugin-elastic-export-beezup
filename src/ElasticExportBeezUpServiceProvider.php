@@ -19,6 +19,7 @@ class ElasticExportBeezUpServiceProvider extends DataExchangeServiceProvider
             'ElasticExportBeezUp\ResultField\BeezUp',
             'ElasticExportBeezUp\Generator\BeezUp',
             '',
+            true,
             true
         );
     }
