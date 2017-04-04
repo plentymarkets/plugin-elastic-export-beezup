@@ -2,11 +2,9 @@
 
 namespace ElasticExportBeezUp\Generator;
 
+use Plenty\Legacy\Repositories\Item\SalesPrice\SalesPriceSearchRepository;
 use Plenty\Modules\DataExchange\Contracts\CSVPluginGenerator;
 use Plenty\Modules\Helper\Services\ArrayHelper;
-use Plenty\Modules\Item\DataLayer\Models\Record;
-use Plenty\Modules\Item\DataLayer\Models\RecordList;
-use Plenty\Modules\DataExchange\Models\FormatSetting;
 use ElasticExport\Helper\ElasticExportCoreHelper;
 use Plenty\Modules\Helper\Models\KeyValue;
 use Plenty\Modules\Item\Attribute\Contracts\AttributeValueNameRepositoryContract;
@@ -14,11 +12,19 @@ use Plenty\Modules\Item\Attribute\Models\AttributeValueName;
 use Plenty\Modules\Item\Property\Contracts\PropertyMarketReferenceRepositoryContract;
 use Plenty\Modules\Item\Property\Contracts\PropertyNameRepositoryContract;
 use Plenty\Modules\Item\Property\Models\PropertyName;
+use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
+use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
+use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchScrollRepositoryContract;
+use Plenty\Plugin\Log\Loggable;
 
 class BeezUp extends CSVPluginGenerator
 {
+    use Loggable;
+
 	const MARKET_REFERENCE_BEEZUP = 127.00;
 	const PROPERTY_TYPE_DESCRIPTION = 'description';
+    const TRANSFER_RRP_YES = 1;
+    const TRANSFER_OFFER_PRICE_YES = 1;
 
 	/**
 	 * @var ElasticExportCoreHelper $elasticExportHelper
@@ -36,164 +42,168 @@ class BeezUp extends CSVPluginGenerator
 	private $attributeValueNameRepository;
 
 	/**
-	 * @var array $idlVariations
-	 */
-	private $idlVariations = array();
-
-	/**
 	 * @var array $propertyData
 	 */
 	private $propertyData = [];
+    /**
+     * @var salesPriceSearchRepository
+     */
+    private $salesPriceSearchRepository;
 
-	/**
-	 * BeezUp constructor.
-	 * @param ArrayHelper $arrayHelper
-	 * @param AttributeValueNameRepositoryContract $attributeValueNameRepository
-	 */
+    /**
+     * BeezUp constructor.
+     * @param ArrayHelper $arrayHelper
+     * @param AttributeValueNameRepositoryContract $attributeValueNameRepository
+     * @param SalesPriceSearchRepository $salesPriceSearchRepository
+     */
 	public function __construct(
 		ArrayHelper $arrayHelper,
-		AttributeValueNameRepositoryContract $attributeValueNameRepository
+		AttributeValueNameRepositoryContract $attributeValueNameRepository,
+        salesPriceSearchRepository $salesPriceSearchRepository
 	)
 	{
 		$this->arrayHelper = $arrayHelper;
 		$this->attributeValueNameRepository = $attributeValueNameRepository;
-	}
+        $this->salesPriceSearchRepository = $salesPriceSearchRepository;
+    }
 
 	/**
-	 * @param array $resultData
+	 * @param VariationElasticSearchScrollRepositoryContract $resultData
 	 * @param array $formatSettings
 	 * @param array $filter
 	 */
-	protected function generatePluginContent($resultData, array $formatSettings = [], array $filter = [])
+	protected function generatePluginContent($elasticSearch, array $formatSettings = [], array $filter = [])
 	{
 		$this->elasticExportHelper = pluginApp(ElasticExportCoreHelper::class);
-		if(is_array($resultData['documents']) && count($resultData['documents']) > 0)
-		{
-			$settings = $this->arrayHelper->buildMapFromObjectList($formatSettings, 'key', 'value');
-			$this->setDelimiter(";");
-			$csvHeader = [
-				'Produkt ID',
-				'Artikel Nr',
-				'MPN',
-				'EAN',
-				'Marke',
-				'Produktname',
-				'Produktbeschreibung',
-				'Preis inkl. MwSt.',
-				'UVP inkl. MwSt.',
-				'Produkt-URL',
-				'Bild-URL',
-				'Bild-URL2',
-				'Bild-URL3',
-				'Bild-URL4',
-				'Bild-URL5',
-				'Lieferkosten',
-				'Auf Lager',
-				'Lagerbestand',
-				'Lieferfrist',
-				'Kategorie 1',
-				'Kategorie 2',
-				'Kategorie 3',
-				'Kategorie 4',
-				'Kategorie 5',
-				'Kategorie 6',
-				'Farbe',
-				'Größe',
-				'Gewicht',
-				'Grundpreis',
-				'ID'
-			];
+        $settings = $this->arrayHelper->buildMapFromObjectList($formatSettings, 'key', 'value');
+        $this->setDelimiter(";");
+        $csvHeader = [
+            'Produkt ID',
+            'Artikel Nr',
+            'MPN',
+            'EAN',
+            'Marke',
+            'Produktname',
+            'Produktbeschreibung',
+            'Preis inkl. MwSt.',
+            'UVP inkl. MwSt.',
+            'Produkt-URL',
+            'Bild-URL',
+            'Bild-URL2',
+            'Bild-URL3',
+            'Bild-URL4',
+            'Bild-URL5',
+            'Lieferkosten',
+            'Auf Lager',
+            'Lagerbestand',
+            'Lieferfrist',
+            'Kategorie 1',
+            'Kategorie 2',
+            'Kategorie 3',
+            'Kategorie 4',
+            'Kategorie 5',
+            'Kategorie 6',
+            'Farbe',
+            'Größe',
+            'Gewicht',
+            'Grundpreis',
+            'ID'
+        ];
 
-			$variationIdList = $additionalHeaders = [];
-			foreach($resultData['documents'] as $variation)
-			{
-				$variationIdList[] = $variation['id'];
-			}
+        if($elasticSearch instanceof VariationElasticSearchScrollRepositoryContract)
+        {
+            $limitReached = false;
+            $lines = 0;
+            do
+            {
+                if($limitReached === true)
+                {
+                    break;
+                }
 
-			//Get the missing fields in ES from IDL
-			if(is_array($variationIdList) && count($variationIdList) > 0)
-			{
-				/**
-				 * @var \ElasticExportBeezUp\IDL_ResultList\BeezUp $idlResultList
-				 */
-				$idlResultList = pluginApp(\ElasticExportBeezUp\IDL_ResultList\BeezUp::class);
-				$idlResultList = $idlResultList->getResultList($variationIdList, $settings);
-			}
+                $resultList = $elasticSearch->execute();
 
-			//Creates an array with the variationId as key to surpass the sorting problem
-			if(isset($idlResultList) && $idlResultList instanceof RecordList)
-			{
-				$this->createIdlArray($idlResultList);
+                if(is_array($resultList['documents']) && count($resultList['documents']) > 0)
+                {
+                    $additionalHeaders = $this->buildPropertyData($resultList['documents']);
 
-				// extend header by properties
-				$additionalHeaders = $this->buildPropertyData($idlResultList);
-			}
+                    // combine hard coded headers with property based headers
+                    $csvHeader = array_merge($csvHeader, $additionalHeaders);
+                    $this->addCSVContent($csvHeader);
 
-			// combine hard coded headers with property based headers
-			$csvHeader = array_merge($csvHeader, $additionalHeaders);
-			$this->addCSVContent($csvHeader);
+                    foreach($resultList['documents'] as $variation)
+                    {
+                        try
+                        {
+                            $variationAttributes = $this->getVariationAttributes($variation, $settings);
 
-			foreach($resultData['documents'] as $item)
-			{
-				$variationAttributes = $this->getVariationAttributes($item, $settings);
+                            $stockList = $this->getStockList($variation);
+                            $priceList = $this->getPriceList($variation, $settings);
 
-				$stockList = $this->getStockList($item);
+                            // Get shipping costs
+                            $shippingCost = $this->elasticExportHelper->getShippingCost($variation['data']['item']['id'], $settings);
 
-                // Get and set the price and rrp
-				$price = $this->idlVariations[$item['id']]['variationRetailPrice.price'];
-				$rrp = $this->elasticExportHelper->getRecommendedRetailPrice($this->idlVariations[$item['id']]['variationRecommendedRetailPrice.price'], $settings);
-				$rrp = ($price >= $rrp) ? 0 : $rrp;
+                            if(!is_null($shippingCost))
+                            {
+                                $shippingCost = number_format((float)$shippingCost, 2, ',', '');
+                            }
+                            else
+                            {
+                                $shippingCost = '';
+                            }
 
-                // Get shipping costs
-				$shippingCost = $this->elasticExportHelper->getShippingCost($item['data']['item']['id'], $settings);
+                            $data = [
+                                'Produkt ID'            =>  $variation['id'],
+                                'Artikel Nr'            =>  $variation['data']['variation']['number'],
+                                'MPN'                   =>  $variation['data']['variation']['model'],
+                                'EAN'                   =>  $this->elasticExportHelper->getBarcodeByType($variation, $settings->get('barcode')),
+                                'Marke'                 =>  $this->elasticExportHelper->getExternalManufacturerName((int)$variation['data']['item']['manufacturer']['id']),
+                                'Produktname'           =>  $this->elasticExportHelper->getName($variation, $settings, 256),
+                                'Produktbeschreibung'   =>  $this->getDescription($variation, $settings),
+                                'Preis inkl. MwSt.'     =>  number_format((float)$priceList['variationRetailPrice.price'], 2, '.', ''),
+                                'UVP inkl. MwSt.'       =>  $priceList['reducedPrice'] > 0 ?
+                                    number_format((float)$priceList['reducedPrice'], 2, '.', '') : '',
+                                'Produkt-URL'           =>  $this->elasticExportHelper->getUrl($variation, $settings),
+                                'Bild-URL'              =>  $this->getImageByNumber($variation, $settings, 0),
+                                'Bild-URL2'             =>  $this->getImageByNumber($variation, $settings, 1),
+                                'Bild-URL3'             =>  $this->getImageByNumber($variation, $settings, 2),
+                                'Bild-URL4'             =>  $this->getImageByNumber($variation, $settings, 3),
+                                'Bild-URL5'             =>  $this->getImageByNumber($variation, $settings, 4),
+                                'Lieferkosten'          =>  $shippingCost,
+                                'Auf Lager'             =>  $stockList['variationAvailable'],
+                                'Lagerbestand'          =>  $stockList['stock'],
+                                'Lieferfrist'           =>  $this->elasticExportHelper->getAvailability($variation, $settings, false),
+                                'Kategorie 1'           =>  $this->elasticExportHelper->getCategoryBranch($variation['data']['defaultCategories'][0]['id'], $settings, 1),
+                                'Kategorie 2'           =>  $this->elasticExportHelper->getCategoryBranch($variation['data']['defaultCategories'][0]['id'], $settings, 2),
+                                'Kategorie 3'           =>  $this->elasticExportHelper->getCategoryBranch($variation['data']['defaultCategories'][0]['id'], $settings, 3),
+                                'Kategorie 4'           =>  $this->elasticExportHelper->getCategoryBranch($variation['data']['defaultCategories'][0]['id'], $settings, 4),
+                                'Kategorie 5'           =>  $this->elasticExportHelper->getCategoryBranch($variation['data']['defaultCategories'][0]['id'], $settings, 5),
+                                'Kategorie 6'           =>  $this->elasticExportHelper->getCategoryBranch($variation['data']['defaultCategories'][0]['id'], $settings, 6),
+                                'Farbe'                 =>  $variationAttributes['Color'],
+                                'Größe'                 =>  $variationAttributes['Size'],
+                                'Gewicht'               =>  $variation['data']['variation']['weightG'],
+                                'Grundpreis'            =>  $this->elasticExportHelper->getBasePrice($variation, $priceList),
+                                'ID'                    =>  $variation['data']['item']['id'],
+                            ];
 
-				if(!is_null($shippingCost))
-				{
-					$shippingCost = number_format((float)$shippingCost, 2, ',', '');
-				}
-				else
-				{
-					$shippingCost = '';
-				}
+                            $data = $this->addPropertyData($data, $variation['id']);
 
-				$data = [
-					'Produkt ID'            =>  $item['id'],
-					'Artikel Nr'            =>  $this->idlVariations[$item['id']]['variationBase.customNumber'],
-					'MPN'                   =>  $item['data']['variation']['model'],
-					'EAN'                   =>  $this->elasticExportHelper->getBarcodeByType($item, $settings->get('barcode')),
-					'Marke'                 =>  $this->elasticExportHelper->getExternalManufacturerName((int)$item['data']['item']['manufacturer']['id']),
-					'Produktname'           =>  $this->elasticExportHelper->getName($item, $settings, 256),
-					'Produktbeschreibung'   =>  $this->getDescription($item, $settings),
-					'Preis inkl. MwSt.'     =>  number_format((float)$price, 2, '.', ''),
-					'UVP inkl. MwSt.'       =>  number_format((float)$rrp, 2, '.', ''),
-					'Produkt-URL'           =>  $this->elasticExportHelper->getUrl($item, $settings),
-					'Bild-URL'              =>  $this->getImageByNumber($item, $settings, 0),
-					'Bild-URL2'             =>  $this->getImageByNumber($item, $settings, 1),
-					'Bild-URL3'             =>  $this->getImageByNumber($item, $settings, 2),
-					'Bild-URL4'             =>  $this->getImageByNumber($item, $settings, 3),
-					'Bild-URL5'             =>  $this->getImageByNumber($item, $settings, 4),
-					'Lieferkosten'          =>  $shippingCost,
-					'Auf Lager'             =>  $stockList['variationAvailable'],
-					'Lagerbestand'          =>  $stockList['stock'],
-					'Lieferfrist'           =>  $this->elasticExportHelper->getAvailability($item['data']['defaultCategories'][0]['id'], $settings, false),
-					'Kategorie 1'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 1),
-					'Kategorie 2'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 2),
-					'Kategorie 3'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 3),
-					'Kategorie 4'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 4),
-					'Kategorie 5'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 5),
-					'Kategorie 6'           =>  $this->elasticExportHelper->getCategoryBranch($item['data']['defaultCategories'][0]['id'], $settings, 6),
-					'Farbe'                 =>  $variationAttributes['Color'],
-					'Größe'                 =>  $variationAttributes['Size'],
-					'Gewicht'               =>  $item['data']['variation']['weightG'],
-					'Grundpreis'            =>  $this->elasticExportHelper->getBasePrice($item, $this->idlVariations[$item['id']]),
-					'ID'                    =>  $item['data']['item']['id'],
-				];
+                            $this->addCSVContent(array_values($data));
 
-				$data = $this->addPropertyData($data, $item['id']);
-
-				$this->addCSVContent(array_values($data));
-			}
-		}
+                            $lines = $lines +1;
+                        }
+                        catch(\Throwable $throwable)
+                        {
+                            $this->getLogger(__METHOD__)->error('ElasticExportBeezUp::logs.fillRowError', [
+                                'Error message ' => $throwable->getMessage(),
+                                'Error line'    => $throwable->getLine(),
+                                'VariationId'   => $variation['id']
+                            ]);
+                        }
+                    }
+                }
+            }while ($elasticSearch->hasNext());
+        }
 	}
 
 	/**
@@ -226,6 +236,11 @@ class BeezUp extends CSVPluginGenerator
 
 		foreach($item['data']['attributes'] as $variationAttribute)
 		{
+		    if(is_null($variationAttribute['valueId']))
+		    {
+		        return $variationAttributes;
+            }
+
 			$attributeValueName = $this->attributeValueNameRepository->findOne($variationAttribute['valueId'], $settings->get('lang'));
 
 			if($attributeValueName instanceof AttributeValueName)
@@ -270,40 +285,49 @@ class BeezUp extends CSVPluginGenerator
 	{
 		$variationAvailable = 'N';
 		$stock = 0;
+		$stockNet = 0;
 
+        $stockRepositoryContract = pluginApp(StockRepositoryContract::class);
+        if($stockRepositoryContract instanceof StockRepositoryContract)
+        {
+            $stockRepositoryContract->setFilters(['variationId' => $item['id']]);
+            $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
+            $stockNet = $stockResult->getResult()->first()->stockNet;
+        }
+		
 		if($item['data']['variation']['stockLimitation'] == 2)
 		{
 			$variationAvailable = 'Y';
 			$stock = 999;
 		}
-		elseif($item['data']['variation']['stockLimitation'] == 1 && $this->idlVariations[$item['id']]['variationStock.stockNet'] > 0)
+		elseif($item['data']['variation']['stockLimitation'] == 1 && $stockNet > 0)
 		{
 			$variationAvailable = 'Y';
-			if($this->idlVariations[$item['id']]['variationStock.stockNet'] > 999)
+			if($stockNet > 999)
 			{
 				$stock = 999;
 			}
 			else
 			{
-				$stock = $this->idlVariations[$item['id']]['variationStock.stockNet'];
+				$stock = $stockNet;
 			}
 		}
 		elseif($item['data']['variation']['stockLimitation'] == 0)
 		{
 			$variationAvailable = 'Y';
-			if($this->idlVariations[$item['id']]['variationStock.stockNet'] > 999)
+			if($stockNet > 999)
 			{
 				$stock = 999;
 			}
 			else
 			{
-				if($this->idlVariations[$item['id']]['variationStock.stockNet'] > 0)
+				if($stockNet > 0)
 				{
-					$stock = $this->idlVariations[$item['id']]['variationStock.stockNet'];
+					$stock = $stockNet;
 				}
 				else
 				{
-					$stock = 0;
+					$stock = 999;
 				}
 			}
 		}
@@ -315,85 +339,73 @@ class BeezUp extends CSVPluginGenerator
 
 	}
 
-	/**
-	 * @param RecordList $idlResultList
-	 */
-	private function createIdlArray($idlResultList)
-	{
-		if($idlResultList instanceof RecordList)
-		{
-			foreach($idlResultList as $idlVariation)
-			{
-				if($idlVariation instanceof Record)
-				{
-					$this->idlVariations[$idlVariation->variationBase->id] = [
-						'itemBase.id'                           => $idlVariation->itemBase->id,
-						'variationBase.id'                      => $idlVariation->variationBase->id,
-						'variationBase.customNumber'            => $idlVariation->variationBase->customNumber,
-						'itemPropertyList'                      => $idlVariation->itemPropertyList,
-						'variationStock.stockNet'               => $idlVariation->variationStock->stockNet,
-						'variationRetailPrice.price'            => $idlVariation->variationRetailPrice->price,
-						'variationRecommendedRetailPrice.price' => $idlVariation->variationRecommendedRetailPrice->price,
-					];
-				}
-			}
-		}
-	}
+    /**
+     * Returns a list of additional header for the CSV based on
+     * the configured properties and builds also the property data for
+     * further usage. The properties have to have a configuration for BeezUp.
+     *
+     * @param array $variations
+     * @return array
+     */
+    private function buildPropertyData($variations):array
+    {
+        /**
+         * @var PropertyNameRepositoryContract $propertyNameRepository
+         */
+        $propertyNameRepository = pluginApp(PropertyNameRepositoryContract::class);
 
-	/**
-	 * Returns a list of additional header for the CSV based on
-	 * the configured properties and builds also the property data for
-	 * further usage. The properties have to have a configuration for BeezUp.
-	 *
-	 * @param RecordList $idLResultList
-	 * @return array
-	 */
-	private function buildPropertyData($idLResultList):array
-	{
-		/**
-		 * @var PropertyNameRepositoryContract $propertyNameRepository
-		 */
-		$propertyNameRepository = pluginApp(PropertyNameRepositoryContract::class);
+        /**
+         * @var PropertyMarketReferenceRepositoryContract $propertyMarketReferenceRepository
+         */
+        $propertyMarketReferenceRepository = pluginApp(PropertyMarketReferenceRepositoryContract::class);
+        $header = [];
 
-		/**
-		 * @var PropertyMarketReferenceRepositoryContract $propertyMarketReferenceRepository
-		 */
-		$propertyMarketReferenceRepository = pluginApp(PropertyMarketReferenceRepositoryContract::class);
-		$header = [];
+        if(!$propertyNameRepository instanceof PropertyNameRepositoryContract ||
+            !$propertyMarketReferenceRepository instanceof PropertyMarketReferenceRepositoryContract)
+        {
+            return [];
+        }
 
-		if(!$propertyNameRepository instanceof PropertyNameRepositoryContract ||
-			!$propertyMarketReferenceRepository instanceof PropertyMarketReferenceRepositoryContract)
-		{
-			return [];
-		}
+        foreach($variations as $variation)
+        {
+            foreach($variation['data']['properties'] as $property)
+            {
+                if(!is_null($property['property']['id']))
+                {
+                    $propertyName = $propertyNameRepository->findOne($property['property']['id'], 'de');
+                    $propertyMarketReference = $propertyMarketReferenceRepository->findOne($property['property']['id'], self::MARKET_REFERENCE_BEEZUP);
 
-		/**
-		 * @var RecordList $variation
-		 */
-		foreach($idLResultList as $variation)
-		{
-			foreach($variation->itemPropertyList as $property)
-			{
-				$propertyName = $propertyNameRepository->findOne($property->propertyId, 'de');
-				$propertyMarketReference = $propertyMarketReferenceRepository->findOne($property->propertyId, self::MARKET_REFERENCE_BEEZUP);
-
-				if(!($propertyName instanceof PropertyName) ||
-					is_null($propertyName) ||
-					is_null($propertyMarketReference)
-				)
-				{
-					continue;
-				}
+                    if(!($propertyName instanceof PropertyName) ||
+                        is_null($propertyName) ||
+                        is_null($propertyMarketReference)
+                    )
+                    {
+                        continue;
+                    }
 
 
 
-				$header[] = $propertyName->name;
-				$this->propertyData[$variation->variationBase->id][$propertyName->name] = $property->propertyValue;
-			}
-		}
+                    $header[] = $propertyName->name;
+                    if($property['property']['valueType'] == 'text')
+                    {
+                        if(is_array($property['texts']))
+                        {
+                            $this->propertyData[$variation['id']][$propertyName->name] = $property['texts'][0]['value'];
+                        }
+                    }
+                    if($property['property']['valueType'] == 'selection')
+                    {
+                        if(is_array($property['selection']))
+                        {
+                            $this->propertyData[$variation['id']][$propertyName->name] = $property['selection'][0]['name'];
+                        }
+                    }
+                }
+            }
+        }
 
-		return array_unique($header);
-	}
+        return array_unique($header);
+    }
 
 	/**
 	 * Adds the data of the properties to the existing data array.
@@ -412,4 +424,58 @@ class BeezUp extends CSVPluginGenerator
 
 		return $data;
 	}
+
+    /**
+     * Get a List of price, reduced price and the reference for the reduced price.
+     * @param array $item
+     * @param KeyValue $settings
+     * @return array
+     */
+    private function getPriceList($item, KeyValue $settings):array
+    {
+        //getting the retail price
+        /**
+         * SalesPriceSearchRequest $salesPriceSearchRequest
+         */
+        $salesPriceSearchRequest = pluginApp(SalesPriceSearchRequest::class);
+        if($salesPriceSearchRequest instanceof SalesPriceSearchRequest)
+        {
+            $salesPriceSearchRequest->variationId = $item['id'];
+            $salesPriceSearchRequest->referrerId = $settings->get('referrerId');
+        }
+
+        $salesPriceSearch  = $this->salesPriceSearchRepository->search($salesPriceSearchRequest);
+        $variationPrice = $salesPriceSearch->price;
+
+        //getting the recommended retail price
+        if($settings->get('transferRrp') == self::TRANSFER_RRP_YES)
+        {
+            $salesPriceSearchRequest->type = 'rrp';
+            $variationRrp = $this->salesPriceSearchRepository->search($salesPriceSearchRequest)->price;
+        }
+        else
+        {
+            $variationRrp = 0.00;
+        }
+
+        //setting retail price as selling price without a reduced price
+        $price = $variationPrice;
+        $reducedPrice = '';
+
+        if ($price != '' || $price != 0.00)
+        {
+            //if recommended retail price is set and higher than retail price...
+            if ($variationRrp > 0 && $variationRrp > $variationPrice)
+            {
+                //set recommended retail price as selling price
+                $price = $variationRrp;
+                //set retail price as reduced price
+                $reducedPrice = $variationPrice;
+            }
+        }
+        return array(
+            'variationRetailPrice.price'                     =>  $price,
+            'reducedPrice'                                   =>  $reducedPrice,
+        );
+    }
 }

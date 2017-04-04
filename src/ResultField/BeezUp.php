@@ -8,6 +8,7 @@ use Plenty\Modules\Helper\Services\ArrayHelper;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 use Plenty\Modules\Item\Search\Mutators\DefaultCategoryMutator;
+use Plenty\Modules\Item\Search\Mutators\KeyMutator;
 
 class BeezUp extends ResultFields
 {
@@ -66,6 +67,15 @@ class BeezUp extends ResultFields
 
         //Mutator
         /**
+         * @var KeyMutator $keyMutator
+         */
+        $keyMutator = pluginApp(KeyMutator::class);
+        if($keyMutator instanceof KeyMutator)
+        {
+            $keyMutator->setKeyList($this->getKeyList());
+            $keyMutator->setNestedKeyList($this->getNestedKeyList());
+        }
+        /**
          * @var ImageMutator $imageMutator
          */
         $imageMutator = pluginApp(ImageMutator::class);
@@ -98,6 +108,7 @@ class BeezUp extends ResultFields
                 'variation.stockLimitation',
                 'variation.weightG',
                 'variation.model',
+                'variation.number',
 
                 //attributes
                 'attributes.valueId',
@@ -120,15 +131,26 @@ class BeezUp extends ResultFields
                 //defaultCategories
                 'defaultCategories.id',
 
+                //unit
+                'unit.content',
+                'unit.id',
+
                 //barcodes
                 'barcodes.code',
                 'barcodes.id',
                 'barcodes.type',
+
+                //properties
+                'properties.property.id',
+                'properties.property.valueType',
+                'properties.selection.name',
+                'properties.texts.value'
             ],
 
             [
                 $languageMutator,
-                $defaultCategoryMutator
+                $defaultCategoryMutator,
+                $keyMutator
             ],
         ];
 
@@ -143,5 +165,102 @@ class BeezUp extends ResultFields
         }
 
         return $fields;
+    }
+
+    private function getKeyList()
+    {
+        $keyList = [
+            //item
+            'item.id',
+            'item.manufacturer.id',
+
+            //variation
+            'variation.availability.id',
+            'variation.stockLimitation',
+            'variation.weightG',
+            'variation.model',
+            'variation.number',
+
+            //unit
+            'unit.content',
+            'unit.id',
+        ];
+
+        return $keyList;
+    }
+
+    private function getNestedKeyList()
+    {
+        $nestedKeyList['keys'] = [
+            //images
+            'images.item',
+            'images.variation',
+
+            //texts
+            'texts',
+
+            //defaultCategories
+            'defaultCategories',
+
+            //barcodes
+            'barcodes',
+
+            //attributes
+            'attributes',
+
+            //properties
+            'properties',
+            'properties.selection',
+            'properties.texts',
+        ];
+        $nestedKeyList['nestedKeys'] = [
+            'images.item' => [
+                'urlMiddle',
+                'urlPreview',
+                'urlSecondPreview',
+                'url',
+                'path',
+                'position',
+            ],
+
+            'images.variation' => [
+                'urlMiddle',
+                'urlPreview',
+                'urlSecondPreview',
+                'url',
+                'path',
+                'position',
+            ],
+
+            'texts'  => [
+                'urlPath',
+                'name1',
+                'name2',
+                'name3',
+                'shortDescription',
+                'description',
+                'technicalData',
+            ],
+
+            'defaultCategories' => [
+                'id'
+            ],
+
+            'barcodes'  => [
+                'code',
+                'type',
+            ],
+
+            'attributes'   => [
+                'valueId',
+            ],
+
+            'properties'    => [
+                'property.id',
+                'property.valueType',
+            ],
+        ];
+
+        return $nestedKeyList;
     }
 }
