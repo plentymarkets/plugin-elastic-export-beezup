@@ -327,7 +327,7 @@ class BeezUp extends CSVPluginGenerator
 				}
 				else
 				{
-					$stock = 0;
+					$stock = 999;
 				}
 			}
 		}
