@@ -133,11 +133,21 @@ class BeezUp extends CSVPluginGenerator
 
                     foreach($resultList['documents'] as $variation)
                     {
+                        if($lines == $filter['limit'])
+                        {
+                            $limitReached = true;
+                            break;
+                        }
                         try
                         {
                             $variationAttributes = $this->getVariationAttributes($variation, $settings);
 
                             $stockList = $this->getStockList($variation);
+                            if($this->isFilteredByStock($variation, $filter, $stockList['stock']) === true)
+                            {
+                                continue;
+                            }
+
                             $priceList = $this->getPriceList($variation, $settings);
 
                             // Get shipping costs
@@ -205,6 +215,51 @@ class BeezUp extends CSVPluginGenerator
             }while ($elasticSearch->hasNext());
         }
 	}
+
+    /**
+     * @param array $variation
+     * @param array $filter
+     * @param array $stock
+     * @return bool
+     */
+    public function isFilteredByStock($variation, $filter, $stock)
+    {
+        /**
+         * If the stock filter is set, this will sort out all variations
+         * not matching the filter.
+         */
+        if(array_key_exists('variationStock.netPositive' ,$filter))
+        {
+            if($stock <= 0)
+            {
+                return true;
+            }
+        }
+        elseif(array_key_exists('variationStock.isSalable' ,$filter))
+        {
+            if(count($filter['variationStock.isSalable']['stockLimitation']) == 2)
+            {
+                if($variation['data']['variation']['stockLimitation'] != 0 || $variation['data']['variation']['stockLimitation'] != 2)
+                {
+                    if($stock <= 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if($variation['data']['variation']['stockLimitation'] != $filter['variationStock.isSalable']['stockLimitation'][0])
+                {
+                    if($stock <= 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
 	/**
 	 * Get item description.
