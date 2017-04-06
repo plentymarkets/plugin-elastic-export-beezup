@@ -223,21 +223,21 @@ class BeezUp extends CSVPluginGenerator
      */
     public function isFilteredByStock($variation, $filter)
     {
-        $stock = 0;
-        $stockRepositoryContract = pluginApp(StockRepositoryContract::class);
-        if($stockRepositoryContract instanceof StockRepositoryContract)
-        {
-            $stockRepositoryContract->setFilters(['variationId' => $variation['id']]);
-            $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
-            $stock = $stockResult->getResult()->first()->stockNet;
-        }
-
         /**
          * If the stock filter is set, this will sort out all variations
          * not matching the filter.
          */
         if(array_key_exists('variationStock.netPositive' ,$filter))
         {
+            $stock = 0;
+            $stockRepositoryContract = pluginApp(StockRepositoryContract::class);
+            if($stockRepositoryContract instanceof StockRepositoryContract)
+            {
+                $stockRepositoryContract->setFilters(['variationId' => $variation['id']]);
+                $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
+                $stock = $stockResult->getResult()->first()->stockNet;
+            }
+
             if($stock <= 0)
             {
                 return true;
@@ -245,6 +245,15 @@ class BeezUp extends CSVPluginGenerator
         }
         elseif(array_key_exists('variationStock.isSalable' ,$filter))
         {
+            $stock = 0;
+            $stockRepositoryContract = pluginApp(StockRepositoryContract::class);
+            if($stockRepositoryContract instanceof StockRepositoryContract)
+            {
+                $stockRepositoryContract->setFilters(['variationId' => $variation['id']]);
+                $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
+                $stock = $stockResult->getResult()->first()->stockNet;
+            }
+
             if(count($filter['variationStock.isSalable']['stockLimitation']) == 2)
             {
                 if($variation['data']['variation']['stockLimitation'] != 0 && $variation['data']['variation']['stockLimitation'] != 2)
