@@ -143,7 +143,7 @@ class BeezUp extends CSVPluginGenerator
                             $variationAttributes = $this->getVariationAttributes($variation, $settings);
 
                             $stockList = $this->getStockList($variation);
-                            if($this->isFilteredByStock($variation, $filter, $stockList['stock']) === true)
+                            if($this->isFilteredByStock($variation, $filter) === true)
                             {
                                 continue;
                             }
@@ -219,11 +219,19 @@ class BeezUp extends CSVPluginGenerator
     /**
      * @param array $variation
      * @param array $filter
-     * @param array $stock
      * @return bool
      */
-    public function isFilteredByStock($variation, $filter, $stock)
+    public function isFilteredByStock($variation, $filter)
     {
+        $stock = 0;
+        $stockRepositoryContract = pluginApp(StockRepositoryContract::class);
+        if($stockRepositoryContract instanceof StockRepositoryContract)
+        {
+            $stockRepositoryContract->setFilters(['variationId' => $variation['id']]);
+            $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
+            $stock = $stockResult->getResult()->first()->stockNet;
+        }
+
         /**
          * If the stock filter is set, this will sort out all variations
          * not matching the filter.
@@ -239,7 +247,7 @@ class BeezUp extends CSVPluginGenerator
         {
             if(count($filter['variationStock.isSalable']['stockLimitation']) == 2)
             {
-                if($variation['data']['variation']['stockLimitation'] != 0 || $variation['data']['variation']['stockLimitation'] != 2)
+                if($variation['data']['variation']['stockLimitation'] != 0 && $variation['data']['variation']['stockLimitation'] != 2)
                 {
                     if($stock <= 0)
                     {

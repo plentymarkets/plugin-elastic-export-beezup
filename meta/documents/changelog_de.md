@@ -1,5 +1,10 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.0.8 (2017-04-06)
+
+### Behoben
+- Es wurde ein Fehler behoben, der dazu geführt hat, dass der Bestandsfilter nicht richtig funktioniert hat.
+
 ## v1.0.7 (2017-04-04)
 
 ### Hinzugefügt
