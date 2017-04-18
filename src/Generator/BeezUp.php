@@ -16,6 +16,8 @@ use Plenty\Modules\Item\SalesPrice\Models\SalesPriceSearchRequest;
 use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchScrollRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
+use Plenty\Repositories\Models\PaginatedResult;
+use Illuminate\Support\Collection;
 
 class BeezUp extends CSVPluginGenerator
 {
@@ -235,7 +237,15 @@ class BeezUp extends CSVPluginGenerator
             {
                 $stockRepositoryContract->setFilters(['variationId' => $variation['id']]);
                 $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
-                $stock = $stockResult->getResult()->first()->stockNet;
+                if($stockResult instanceof PaginatedResult)
+                {
+                    $stockList = $stockResult->getResult();
+                    foreach($stockList as $stock)
+                    {
+                        $stock = $stock->stockNet;
+                        break;
+                    }
+                }
             }
 
             if($stock <= 0)
@@ -251,7 +261,15 @@ class BeezUp extends CSVPluginGenerator
             {
                 $stockRepositoryContract->setFilters(['variationId' => $variation['id']]);
                 $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
-                $stock = $stockResult->getResult()->first()->stockNet;
+                if($stockResult instanceof PaginatedResult)
+                {
+                    $stockList = $stockResult->getResult();
+                    foreach($stockList as $stock)
+                    {
+                        $stock = $stock->stockNet;
+                        break;
+                    }
+                }
             }
 
             if(count($filter['variationStock.isSalable']['stockLimitation']) == 2)
@@ -364,7 +382,15 @@ class BeezUp extends CSVPluginGenerator
         {
             $stockRepositoryContract->setFilters(['variationId' => $item['id']]);
             $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
-            $stockNet = $stockResult->getResult()->first()->stockNet;
+            if($stockResult instanceof PaginatedResult)
+            {
+                $stockList = $stockResult->getResult();
+                foreach($stockList as $stock)
+                {
+                    $stock = $stock->stockNet;
+                    break;
+                }
+            }
         }
 		
 		if($item['data']['variation']['stockLimitation'] == 2)
