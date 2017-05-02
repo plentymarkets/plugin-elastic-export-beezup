@@ -2,6 +2,7 @@
 
 namespace ElasticExportBeezUp\Generator;
 
+use ElasticExport\Helper\ElasticExportStockHelper;
 use Plenty\Legacy\Repositories\Item\SalesPrice\SalesPriceSearchRepository;
 use Plenty\Modules\DataExchange\Contracts\CSVPluginGenerator;
 use Plenty\Modules\Helper\Services\ArrayHelper;
@@ -17,7 +18,6 @@ use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchScrollRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Repositories\Models\PaginatedResult;
-use Illuminate\Support\Collection;
 
 class BeezUp extends CSVPluginGenerator
 {
@@ -47,26 +47,35 @@ class BeezUp extends CSVPluginGenerator
 	 * @var array $propertyData
 	 */
 	private $propertyData = [];
-    /**
+
+	/**
      * @var salesPriceSearchRepository
      */
     private $salesPriceSearchRepository;
 
     /**
-     * BeezUp constructor.
-     * @param ArrayHelper $arrayHelper
-     * @param AttributeValueNameRepositoryContract $attributeValueNameRepository
-     * @param SalesPriceSearchRepository $salesPriceSearchRepository
+     * @var ElasticExportStockHelper $elasticExportStockHelper
      */
+    private $elasticExportStockHelper;
+
+	/**
+	 * BeezUp constructor.
+	 * @param ArrayHelper $arrayHelper
+	 * @param AttributeValueNameRepositoryContract $attributeValueNameRepository
+	 * @param SalesPriceSearchRepository $salesPriceSearchRepository
+	 * @param ElasticExportStockHelper $elasticExportStockHelper
+	 */
 	public function __construct(
 		ArrayHelper $arrayHelper,
 		AttributeValueNameRepositoryContract $attributeValueNameRepository,
-        salesPriceSearchRepository $salesPriceSearchRepository
+        salesPriceSearchRepository $salesPriceSearchRepository,
+		ElasticExportStockHelper $elasticExportStockHelper
 	)
 	{
 		$this->arrayHelper = $arrayHelper;
 		$this->attributeValueNameRepository = $attributeValueNameRepository;
         $this->salesPriceSearchRepository = $salesPriceSearchRepository;
+        $this->elasticExportStockHelper = $elasticExportStockHelper;
     }
 
 	/**
@@ -145,7 +154,7 @@ class BeezUp extends CSVPluginGenerator
                             $variationAttributes = $this->getVariationAttributes($variation, $settings);
 
                             $stockList = $this->getStockList($variation);
-                            if($this->isFilteredByStock($variation, $filter) === true)
+                            if($this->elasticExportStockHelper->isFilteredByStock($variation, $filter) === true)
                             {
                                 continue;
                             }
@@ -217,84 +226,6 @@ class BeezUp extends CSVPluginGenerator
             }while ($elasticSearch->hasNext());
         }
 	}
-
-    /**
-     * @param array $variation
-     * @param array $filter
-     * @return bool
-     */
-    public function isFilteredByStock($variation, $filter)
-    {
-        /**
-         * If the stock filter is set, this will sort out all variations
-         * not matching the filter.
-         */
-        if(array_key_exists('variationStock.netPositive' ,$filter))
-        {
-            $stock = 0;
-            $stockRepositoryContract = pluginApp(StockRepositoryContract::class);
-            if($stockRepositoryContract instanceof StockRepositoryContract)
-            {
-                $stockRepositoryContract->setFilters(['variationId' => $variation['id']]);
-                $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
-                if($stockResult instanceof PaginatedResult)
-                {
-                    $stockList = $stockResult->getResult();
-                    foreach($stockList as $stock)
-                    {
-                        $stock = $stock->stockNet;
-                        break;
-                    }
-                }
-            }
-
-            if($stock <= 0)
-            {
-                return true;
-            }
-        }
-        elseif(array_key_exists('variationStock.isSalable' ,$filter))
-        {
-            $stock = 0;
-            $stockRepositoryContract = pluginApp(StockRepositoryContract::class);
-            if($stockRepositoryContract instanceof StockRepositoryContract)
-            {
-                $stockRepositoryContract->setFilters(['variationId' => $variation['id']]);
-                $stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
-                if($stockResult instanceof PaginatedResult)
-                {
-                    $stockList = $stockResult->getResult();
-                    foreach($stockList as $stock)
-                    {
-                        $stock = $stock->stockNet;
-                        break;
-                    }
-                }
-            }
-
-            if(count($filter['variationStock.isSalable']['stockLimitation']) == 2)
-            {
-                if($variation['data']['variation']['stockLimitation'] != 0 && $variation['data']['variation']['stockLimitation'] != 2)
-                {
-                    if($stock <= 0)
-                    {
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                if($variation['data']['variation']['stockLimitation'] != $filter['variationStock.isSalable']['stockLimitation'][0])
-                {
-                    if($stock <= 0)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
 	/**
 	 * Get item description.
