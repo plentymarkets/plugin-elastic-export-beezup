@@ -63,19 +63,16 @@ class BeezUp extends CSVPluginGenerator
 	 * @param ArrayHelper $arrayHelper
 	 * @param AttributeValueNameRepositoryContract $attributeValueNameRepository
 	 * @param SalesPriceSearchRepository $salesPriceSearchRepository
-	 * @param ElasticExportStockHelper $elasticExportStockHelper
 	 */
 	public function __construct(
 		ArrayHelper $arrayHelper,
 		AttributeValueNameRepositoryContract $attributeValueNameRepository,
-        salesPriceSearchRepository $salesPriceSearchRepository,
-		ElasticExportStockHelper $elasticExportStockHelper
+        salesPriceSearchRepository $salesPriceSearchRepository
 	)
 	{
 		$this->arrayHelper = $arrayHelper;
 		$this->attributeValueNameRepository = $attributeValueNameRepository;
         $this->salesPriceSearchRepository = $salesPriceSearchRepository;
-        $this->elasticExportStockHelper = $elasticExportStockHelper;
     }
 
 	/**
@@ -85,6 +82,7 @@ class BeezUp extends CSVPluginGenerator
 	 */
 	protected function generatePluginContent($elasticSearch, array $formatSettings = [], array $filter = [])
 	{
+		$this->elasticExportStockHelper = pluginApp(ElasticExportStockHelper::class);
 		$this->elasticExportHelper = pluginApp(ElasticExportCoreHelper::class);
         $settings = $this->arrayHelper->buildMapFromObjectList($formatSettings, 'key', 'value');
         $this->setDelimiter(";");

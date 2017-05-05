@@ -20,5 +20,8 @@
   "categories": [
     "3523"
   ],
-  "version": "1.0.10"
+  "version": "1.0.11",
+  "dependencies": {
+    "ElasticExport": ">=1.0.12"
+  }
 }
