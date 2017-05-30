@@ -1,5 +1,10 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.0.12 (2017-05-30)
+
+### Geändert
+- Das Plugin Elastic Export ist nun Voraussetzung zur Nutzung des Pluginformats BeezUp.
+
 ## v1.0.11 (2017-05-05)
 
 ### Behoben
