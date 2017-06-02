@@ -17,11 +17,7 @@
     "de": "Das Plugin ElasticExportBeezUp fügt das Datenformat BeezUp-Plugin zum Elastischen Export hinzu.",
     "en": "This plugin ElasticExportBeezUp adds the format BeezUp-Plugin to the Elastic Export."
   },
-  "categories": [
-    "3523"
-  ],
+  "categories": ["3523"],
   "version": "1.0.12",
-  "require": {
-    "ElasticExport": ">=1.0.12"
-  }
+  "require": ["ElasticExport"]
 }
