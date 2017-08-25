@@ -5,6 +5,7 @@ namespace ElasticExportBeezUp\ResultField;
 use Plenty\Modules\DataExchange\Contracts\ResultFields;
 use Plenty\Modules\DataExchange\Models\FormatSetting;
 use Plenty\Modules\Helper\Services\ArrayHelper;
+use Plenty\Modules\Item\Search\Mutators\BarcodeMutator;
 use Plenty\Modules\Item\Search\Mutators\ImageMutator;
 use Plenty\Modules\Cloud\ElasticSearch\Lib\Source\Mutator\BuiltIn\LanguageMutator;
 use Plenty\Modules\Item\Search\Mutators\DefaultCategoryMutator;
@@ -64,6 +65,7 @@ class BeezUp extends ResultFields
             $itemDescriptionFields[] = 'texts.description';
         }
         $itemDescriptionFields[] = 'texts.technicalData';
+        $itemDescriptionFields[] = 'texts.lang';
 
         //Mutator
         /**
@@ -95,6 +97,15 @@ class BeezUp extends ResultFields
         {
             $defaultCategoryMutator->setPlentyId($settings->get('plentyId'));
         }
+
+		/**
+		 * @var BarcodeMutator $barcodeMutator
+		 */
+		$barcodeMutator = pluginApp(BarcodeMutator::class);
+		if($barcodeMutator instanceof BarcodeMutator)
+		{
+			$barcodeMutator->addMarket($reference);
+		}
 
         $fields = [
             [
@@ -141,15 +152,21 @@ class BeezUp extends ResultFields
                 'barcodes.type',
 
                 //properties
-                'properties.property.id',
-                'properties.property.valueType',
-                'properties.selection.name',
-                'properties.texts.value'
-            ],
+				'properties.property.id',
+				'properties.property.valueType',
+				'properties.selection.name',
+				'properties.selection.lang',
+				'properties.texts.value',
+				'properties.texts.lang',
+				'properties.valueInt',
+				'properties.valueFloat',
+
+			],
 
             [
                 $languageMutator,
                 $defaultCategoryMutator,
+				$barcodeMutator,
                 $keyMutator
             ],
         ];

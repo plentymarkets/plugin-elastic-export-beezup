@@ -1,5 +1,11 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.0.13 (2017-08-25) 
+
+### Geändert
+- Das Format-Plugin basiert nun nur noch auf Elastic Search.
+- Die Performance wurde verbessert.
+
 ## v1.0.12 (2017-05-30)
 
 ### Geändert
