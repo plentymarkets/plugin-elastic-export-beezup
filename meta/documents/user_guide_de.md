@@ -129,7 +129,7 @@ In der folgenden Tabelle finden Sie Hinweise zu den Einstellungen, Formateinstel
 			Artikel Nr
 		</td>
 		<td>
-			<b>Inhalt:</b> Das <b>Variantennummer</b> der Variante.
+			<b>Inhalt:</b> Die <b>Variantennummer</b> der Variante.
 		</td>        
 	</tr>
 	<tr>
@@ -257,7 +257,7 @@ In der folgenden Tabelle finden Sie Hinweise zu den Einstellungen, Formateinstel
 			Lagerbestand
 		</td>
 		<td>
-			<b>Inhalt:</b> Der <b>Nettowarenbestand der Variante</b>. Bei Artikeln, die nicht auf den Nettowarenbestand beschränkt sind, wird <b>999</b> übertragen.
+			<b>Inhalt:</b> Der <b>Netto-Warenbestand der Variante</b>. Bei Artikeln, die nicht auf den Nett-Warenbestand beschränkt sind, wird <b>999</b> übertragen.
 		</td>        
 	</tr>
 	<tr>
@@ -345,7 +345,7 @@ In der folgenden Tabelle finden Sie Hinweise zu den Einstellungen, Formateinstel
 			Grundpreis
 		</td>
 		<td>
-			<b>Content:</b> The <b>base price information</b>. The format is "price / unit". (Example: 10,00 EUR / kilogram)
+			<b>Inhalt:</b> Die <b>Grundpreisinformation</b> im Format "Preis / Einheit". (Beispiel: 10,00 EUR / Kilogramm)
 		</td>        
 	</tr>
 	<tr>
