@@ -136,7 +136,7 @@ The following table lists details for settings, format settings and recommended 
 			Artikel Nr
 		</td>
 		<td>
-			<b>Content:</b> The <b>Variation number</b> of the variation.
+			<b>Content:</b> The <b>variation number</b> of the variation.
 		</td>        
 	</tr>
 	<tr>
@@ -144,7 +144,7 @@ The following table lists details for settings, format settings and recommended 
 			MPN
 		</td>
 		<td>
-			<b>Content:</b> The <b>Model</b> of the variation.
+			<b>Content:</b> The <b>model</b> of the variation.
 		</td>        
 	</tr>
 	<tr>
@@ -208,7 +208,7 @@ The following table lists details for settings, format settings and recommended 
 			Bild1
 		</td>
 		<td>
-			<b>Content:</b> The image url. Variation images are prioritizied over item images.
+			<b>Content:</b> The image URL. Variation images are prioritizied over item images.
 		</td>        
 	</tr>
 	<tr>
@@ -216,7 +216,7 @@ The following table lists details for settings, format settings and recommended 
 			Bild2
 		</td>
 		<td>
-			<b>Content:</b> The image url. Variation images are prioritizied over item images.
+			<b>Content:</b> The image URL. Variation images are prioritizied over item images.
 		</td>        
 	</tr>
 	<tr>
@@ -224,7 +224,7 @@ The following table lists details for settings, format settings and recommended 
 			Bild3
 		</td>
 		<td>
-			<b>Content:</b> The image url. Variation images are prioritizied over item images.
+			<b>Content:</b> The image URL. Variation images are prioritizied over item images.
 		</td>        
 	</tr>
 	<tr>
@@ -232,7 +232,7 @@ The following table lists details for settings, format settings and recommended 
 			Bild4
 		</td>
 		<td>
-			<b>Content:</b> The image url. Variation images are prioritizied over item images.
+			<b>Content:</b> The image URL. Variation images are prioritizied over item images.
 		</td>        
 	</tr>
 	<tr>
@@ -240,7 +240,7 @@ The following table lists details for settings, format settings and recommended 
 			Bild5
 		</td>
 		<td>
-			<b>Content:</b> The image url. Variation images are prioritizied over item images.
+			<b>Content:</b> The image URL. Variation images are prioritizied over item images.
 		</td>        
 	</tr>
 	<tr>
@@ -248,7 +248,7 @@ The following table lists details for settings, format settings and recommended 
 			Lieferkosten
 		</td>
 		<td>
-			<b>Content:</b> According to the format setting <b>shipping costs</b>.
+			<b>Content:</b> According to the format setting <b>Shipping costs</b>.
 		</td>        
 	</tr>
 	<tr>
@@ -256,7 +256,7 @@ The following table lists details for settings, format settings and recommended 
 			Auf Lager
 		</td>
 		<td>
-			<b>Content:</b> Decleares, wether the variation has <b>stock</b>, depending on <b>stock_detail</b>.
+			<b>Content:</b> Defines wether the variation has <b>stock</b>, depending on <b>stock_detail</b>.
 		</td>        
 	</tr>
 	<tr>
