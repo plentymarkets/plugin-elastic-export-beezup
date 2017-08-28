@@ -256,7 +256,7 @@ The following table lists details for settings, format settings and recommended 
 			Auf Lager
 		</td>
 		<td>
-			<b>Inhalt:</b> Gibt an, ob die Variante <b>Bestand</b> abhängig von <b>stock_detail</b> hat.
+			<b>Content:</b> Decleares, wether the variation has <b>stock</b>, depending on <b>stock_detail</b>.
 		</td>        
 	</tr>
 	<tr>
@@ -264,7 +264,7 @@ The following table lists details for settings, format settings and recommended 
 			Lagerbestand
 		</td>
 		<td>
-			<b>Ausgabe:</b> Der <b>Nettowarenbestand der Variante</b>. Bei Artikeln, die nicht auf den Nettowarenbestand beschränkt sind, wird <b>999</b> übertragen.
+			<b>Content:</b> The <b>netto stock of the variation</b>. The stock <b>999</b> will be exported for items which have no stock limitation.
 		</td>        
 	</tr>
 	<tr>
@@ -272,7 +272,7 @@ The following table lists details for settings, format settings and recommended 
 			Lieferfrist
 		</td>
 		<td>
-			<b>Content:</b>The <b>name of the item availability</b> under <b>Settings » Item » Item availability</b> or the translation according to the format setting <b>Item availability</b>.
+			<b>Content:</b>The <b>name of the item availability</b> within <b>Settings » Item » Item availability</b> or the translation according to the format setting <b>Item availability</b>.
 		</td>        
 	</tr>
 	<tr>
@@ -280,7 +280,7 @@ The following table lists details for settings, format settings and recommended 
 			Kategorie 1
 		</td>
 		<td>
-			<b>Inhalt:</b> Der Name der Kategorieebene 1.
+			<b>Content:</b> The name of the category level 1.
 		</td>        
 	</tr>
 	<tr>
@@ -288,7 +288,7 @@ The following table lists details for settings, format settings and recommended 
 			Kategorie 2
 		</td>
 		<td>
-			<b>Inhalt:</b> Der Name der Kategorieebene 2.
+			<b>Content:</b> The name of the category level 2.
 		</td>        
 	</tr>
 	<tr>
@@ -296,7 +296,7 @@ The following table lists details for settings, format settings and recommended 
 			Kategorie 3
 		</td>
 		<td>
-			<b>Inhalt:</b> Der Name der Kategorieebene 3.
+			<b>Content:</b> The name of the category level 3.
 		</td>        
 	</tr>
 	<tr>
@@ -304,7 +304,7 @@ The following table lists details for settings, format settings and recommended 
 			Kategorie 4
 		</td>
 		<td>
-			<b>Inhalt:</b> Der Name der Kategorieebene 4.
+			<b>Content:</b> The name of the category level 4.
 		</td>        
 	</tr>
 	<tr>
@@ -312,7 +312,7 @@ The following table lists details for settings, format settings and recommended 
 			Kategorie 5
 		</td>
 		<td>
-			<b>Inhalt:</b> Der Name der Kategorieebene 5.
+			<b>Content:</b> The name of the category level 5.
 		</td>        
 	</tr>
 	<tr>
@@ -320,7 +320,7 @@ The following table lists details for settings, format settings and recommended 
 			Kategorie 6
 		</td>
 		<td>
-			<b>Inhalt:</b> Der Name der Kategorieebene 6.
+			<b>Content:</b> The name of the category level 6.
 		</td>        
 	</tr>
 	<tr>
@@ -328,7 +328,7 @@ The following table lists details for settings, format settings and recommended 
 			Farbe
 		</td>
 		<td>
-			<b>Inhalt:</b> Der Wert eines Attributs, bei dem die Attributverknüpfung für <b>Amazon</b> mit <b>Color</b> gesetzt wurde. 
+			<b>Content:</b> The attribute value of an attribute which is linked to <b>Amazon</b> with <b>Color</b>. 
 		</td>        
 	</tr>
 	<tr>
@@ -336,7 +336,7 @@ The following table lists details for settings, format settings and recommended 
 			Größe
 		</td>
 		<td>
-			<b>Inhalt:</b> Der Wert eines Attributs, bei dem die Attributverknüpfung für <b>Amazon</b> mit <b>Size</b> gesetzt wurde.
+			<b>Content:</b> The attribute value of an attribute which is linked to <b>Amazon</b> with <b>Size</b>.
 		</td>        
 	</tr>
     <tr>
@@ -344,7 +344,7 @@ The following table lists details for settings, format settings and recommended 
 			Gewicht
 		</td>
 		<td>
-			<b>Inhalt:</b> Das <b>Gewicht</b> der Variante.
+			<b>Content:</b> The <b>weight</b> of the variation.
 		</td>        
 	</tr>
 	<tr>
@@ -360,7 +360,7 @@ The following table lists details for settings, format settings and recommended 
 			ID
 		</td>
 		<td>
-			<b>Inhalt:</b> Die <b>Artikel-ID</b> der Variante.
+			<b>Content:</b> The <b>item ID</b> of the variation.
 		</td>        
 	</tr>
 </table>
