@@ -1,6 +1,11 @@
 # Release Notes für Elastic Export BeezUp
 
-## v1.0.13 (2017-08-25) 
+## v1.0.14 (2017-09-12)
+
+### Behoben
+- In bestimmten Fällen wurden die Werte von Merkmalen im falschen Feld exportiert.
+
+## v1.0.13 (2017-08-25)
 
 ### Geändert
 - Das Format-Plugin basiert nun nur noch auf Elastic Search.

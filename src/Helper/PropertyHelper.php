@@ -18,6 +18,11 @@ class PropertyHelper
 	 */
 	private $propertyList = [];
 
+	/**
+	 * @var array
+	 */
+	private $propertyBaseHeader = [];
+
 	public function __construct(ElasticExportPropertyHelper $elasticExportPropertyHelper)
 	{
 		$this->elasticExportPropertyHelper = $elasticExportPropertyHelper;
@@ -34,23 +39,20 @@ class PropertyHelper
 	public function buildPropertyData($variations)
 	{
 		$header = [];
+
 		foreach($variations as $variation)
 		{
 			foreach($variation['data']['properties'] as $property)
 			{
 				if(!is_null($property['property']['id']))
 				{
-
 					$propertyData = $this->elasticExportPropertyHelper->getItemPropertyList($variation, self::MARKET_REFERENCE_BEEZUP);
 
 					if(count($propertyData))
 					{
-						foreach($propertyData as $key => $value)
+						foreach($propertyData as $propertyName => $value)
 						{
-							$propertyName = $key;
-
 							$header[] = $propertyName;
-
 							$this->propertyList[$variation['id']][$propertyName] = $value;
 						}
 					}
@@ -58,7 +60,8 @@ class PropertyHelper
 			}
 		}
 
-		return array_unique($header);
+		$header = array_unique($header);
+		return $this->propertyBaseHeader = $header;
 	}
 
 	/**
@@ -71,9 +74,14 @@ class PropertyHelper
 	 */
 	public function addPropertyData($data, $variationId):array
 	{
+		foreach($this->propertyBaseHeader as $header)
+		{
+			$data[$header] = "";
+		}
+
 		foreach($this->propertyList[$variationId] as $name => $value)
 		{
-			$data[$name] = $value;
+			$data[$name] = (string)$value;
 		}
 
 		return $data;
