@@ -3,7 +3,7 @@
 ## v1.0.14 (2017-09-12) 
 
 ### Fixed
-- Values of properties were exported in specific cases in the wrong field.
+- In some cases, property values were exported in the wrong field.
 
 ## v1.0.13 (2017-08-25)
 
