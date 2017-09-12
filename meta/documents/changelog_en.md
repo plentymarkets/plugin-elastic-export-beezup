@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.0.14 (2017-09-12) 
+
+### Fixed
+- In some cases, property values were exported in the wrong field.
+
 ## v1.0.13 (2017-08-25)
 
 ### Changed

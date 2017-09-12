@@ -16,6 +16,10 @@ use Plenty\Modules\Helper\Models\KeyValue;
 use Plenty\Modules\Item\Search\Contracts\VariationElasticSearchScrollRepositoryContract;
 use Plenty\Plugin\Log\Loggable;
 
+/**
+ * Class BeezUp
+ * @package ElasticExportBeezUp\Generator
+ */
 class BeezUp extends CSVPluginGenerator
 {
     use Loggable;
@@ -49,6 +53,7 @@ class BeezUp extends CSVPluginGenerator
 	 * @var PropertyHelper
 	 */
 	private $propertyHelper;
+
 	/**
 	 * @var ImageHelper
 	 */
@@ -58,10 +63,12 @@ class BeezUp extends CSVPluginGenerator
 	 * @var ItemHelper
 	 */
 	private $itemHelper;
+
 	/**
 	 * @var AttributeHelper
 	 */
 	private $attributeHelper;
+
 	/**
 	 * @var StockHelper
 	 */
@@ -69,6 +76,7 @@ class BeezUp extends CSVPluginGenerator
 
 	/**
 	 * BeezUp constructor.
+	 *
 	 * @param ArrayHelper $arrayHelper
 	 * @param PropertyHelper $propertyHelper
 	 * @param ImageHelper $imageHelper
@@ -107,12 +115,13 @@ class BeezUp extends CSVPluginGenerator
         $settings = $this->arrayHelper->buildMapFromObjectList($formatSettings, 'key', 'value');
         $this->setDelimiter(self::DELIMITER);
 
-        $csvHeader = $this->setHeader();
+        $header = $this->setHeader();
 
         if($elasticSearch instanceof VariationElasticSearchScrollRepositoryContract)
         {
             $limitReached = false;
             $lines = 0;
+
             do
             {
                 if($limitReached === true)
@@ -131,11 +140,11 @@ class BeezUp extends CSVPluginGenerator
 
                 if(is_array($resultList['documents']) && count($resultList['documents']) > 0)
                 {
-                    $additionalHeaders = $this->propertyHelper->buildPropertyData($resultList['documents']);
+                    $additionalHeader = $this->propertyHelper->buildPropertyData($resultList['documents']);
 
                     // combine hard coded headers with property based headers
-                    $csvHeader = array_merge($csvHeader, $additionalHeaders);
-                    $this->addCSVContent($csvHeader);
+                    $header = array_merge($header, $additionalHeader);
+                    $this->addCSVContent($header);
 
                     foreach($resultList['documents'] as $variation)
                     {
@@ -154,8 +163,7 @@ class BeezUp extends CSVPluginGenerator
                         {
 							// Build the new row for printing in the CSV file
 							$this->buildRow($variation, $settings);
-
-                            $lines = $lines +1;
+                            $lines++;
                         }
                         catch(\Throwable $throwable)
                         {
@@ -167,13 +175,17 @@ class BeezUp extends CSVPluginGenerator
                         }
                     }
                 }
-            }while ($elasticSearch->hasNext());
+            }
+            while ($elasticSearch->hasNext());
         }
 	}
 
+	/**
+	 * @return array
+	 */
 	private function setHeader()
 	{
-		$csvHeader = [
+		$header = [
 			'Produkt ID',
 			'Artikel Nr',
 			'MPN',
@@ -206,7 +218,7 @@ class BeezUp extends CSVPluginGenerator
 			'ID'
 		];
 
-		return $csvHeader;
+		return $header;
 	}
 
 	/**
@@ -218,9 +230,7 @@ class BeezUp extends CSVPluginGenerator
 	private function buildRow($variation, KeyValue $settings)
 	{
 		$stockList = $this->stockHelper->getStockList($variation);
-
 		$variationAttributes = $this->attributeHelper->getVariationAttributes($variation, $settings);
-
 		$priceList = $this->elasticExportPriceHelper->getPriceList($variation, $settings);
 
 		$price = $priceList['price'];
@@ -277,6 +287,15 @@ class BeezUp extends CSVPluginGenerator
 		];
 
 		$data = $this->propertyHelper->addPropertyData($data, $variation['id']);
+
+		// convert null to a string without length
+		foreach($data as $key => $value)
+		{
+			if(is_null($value))
+			{
+				$data[$key] = (string)$value;
+			}
+		}
 
 		$this->addCSVContent(array_values($data));
 	}
