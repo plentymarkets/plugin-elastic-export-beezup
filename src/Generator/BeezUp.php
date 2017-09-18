@@ -289,7 +289,11 @@ class BeezUp extends CSVPluginGenerator
 			'ID'                    =>  $variation['data']['item']['id'],
 		];
 
-		$data = array_merge($data, $this->additionalHeader);
+		foreach($this->additionalHeader as $header)
+		{
+			$data[$header] = "";
+		}
+
 		$data = $this->propertyHelper->addPropertyData($data, $variation);
 
 		$this->addCSVContent(array_values($data));
