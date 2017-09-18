@@ -1,5 +1,10 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.0.15 (2017-09-18)
+
+### Behoben
+- Durch einen Fehler wurde die Header-Zeile der CSV Datei mehrmals exportiert.
+
 ## v1.0.14 (2017-09-12)
 
 ### Behoben

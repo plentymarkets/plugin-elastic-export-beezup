@@ -3,7 +3,15 @@
 namespace ElasticExportBeezUp\Helper;
 
 use ElasticExport\Helper\ElasticExportPropertyHelper;
+use Plenty\Modules\Item\Property\Contracts\PropertyMarketReferenceRepositoryContract;
+use Plenty\Modules\Item\Property\Contracts\PropertyNameRepositoryContract;
+use Plenty\Modules\Item\Property\Models\PropertyMarketReference;
+use Plenty\Modules\Item\Property\Models\PropertyName;
 
+/**
+ * Class PropertyHelper
+ * @package ElasticExportBeezUp\Helper
+ */
 class PropertyHelper
 {
 	const MARKET_REFERENCE_BEEZUP = 127.00;
@@ -14,54 +22,35 @@ class PropertyHelper
 	private $elasticExportPropertyHelper;
 
 	/**
+	 * @var PropertyMarketReferenceRepositoryContract $propertyMarketReferenceRepository
+	 */
+	private $propertyMarketReferenceRepository;
+
+	/**
+	 * @var PropertyNameRepositoryContract
+	 */
+	private $propertyNameRepository;
+
+	/**
 	 * @var array
 	 */
 	private $propertyList = [];
 
 	/**
-	 * @var array
+	 * PropertyHelper constructor.
+	 * @param ElasticExportPropertyHelper $elasticExportPropertyHelper
+	 * @param PropertyMarketReferenceRepositoryContract $propertyMarketReferenceRepository
+	 * @param PropertyNameRepositoryContract $propertyNameRepository
 	 */
-	private $propertyBaseHeader = [];
-
-	public function __construct(ElasticExportPropertyHelper $elasticExportPropertyHelper)
+	public function __construct(
+		ElasticExportPropertyHelper $elasticExportPropertyHelper,
+		PropertyMarketReferenceRepositoryContract $propertyMarketReferenceRepository,
+		PropertyNameRepositoryContract $propertyNameRepository
+	)
 	{
 		$this->elasticExportPropertyHelper = $elasticExportPropertyHelper;
-	}
-
-	/**
-	 * Returns a list of additional header for the CSV based on
-	 * the configured properties and builds also the property data for
-	 * further usage. The properties have to have a configuration for BeezUp.
-	 *
-	 * @param array $variations
-	 * @return array
-	 */
-	public function buildPropertyData($variations)
-	{
-		$header = [];
-
-		foreach($variations as $variation)
-		{
-			foreach($variation['data']['properties'] as $property)
-			{
-				if(!is_null($property['property']['id']))
-				{
-					$propertyData = $this->elasticExportPropertyHelper->getItemPropertyList($variation, self::MARKET_REFERENCE_BEEZUP);
-
-					if(count($propertyData))
-					{
-						foreach($propertyData as $propertyName => $value)
-						{
-							$header[] = $propertyName;
-							$this->propertyList[$variation['id']][$propertyName] = $value;
-						}
-					}
-				}
-			}
-		}
-
-		$header = array_unique($header);
-		return $this->propertyBaseHeader = $header;
+		$this->propertyMarketReferenceRepository = $propertyMarketReferenceRepository;
+		$this->propertyNameRepository = $propertyNameRepository;
 	}
 
 	/**
@@ -69,21 +58,55 @@ class PropertyHelper
 	 * The header of $data has to be extended before.
 	 *
 	 * @param array $data
-	 * @param int $variationId
+	 * @param array $variation
 	 * @return array
 	 */
-	public function addPropertyData($data, $variationId):array
+	public function addPropertyData($data, $variation):array
 	{
-		foreach($this->propertyBaseHeader as $header)
-		{
-			$data[$header] = "";
-		}
+		$properties = $this->elasticExportPropertyHelper->getItemPropertyList($variation, self::MARKET_REFERENCE_BEEZUP);
 
-		foreach($this->propertyList[$variationId] as $name => $value)
+		if(count($properties))
 		{
-			$data[$name] = (string)$value;
+			foreach($properties as $name => $value)
+			{
+				$data[$name] = (string)$value;
+			}
 		}
 
 		return $data;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPropertyBasedHeader(): array
+	{
+		$list = [];
+
+		/**
+		 * @return array
+		 */
+		$result = $this->propertyMarketReferenceRepository->getPropertyMarketReferences(self::MARKET_REFERENCE_BEEZUP);
+
+		if(count($result))
+		{
+			/**
+			 * @var PropertyMarketReference $propertyMarketReference
+			 */
+			foreach($result as $propertyMarketReference)
+			{
+				/**
+				 * @var PropertyName
+				 */
+				$propertyName = $this->propertyNameRepository->findOne($propertyMarketReference->propertyId, 'de');
+
+				if($propertyName instanceof PropertyName && !is_null($propertyName))
+				{
+					$list[] = $propertyName->name;
+				}
+			}
+		}
+
+		return $list;
 	}
 }
