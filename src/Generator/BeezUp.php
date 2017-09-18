@@ -74,6 +74,13 @@ class BeezUp extends CSVPluginGenerator
 	 */
 	private $stockHelper;
 
+
+	/**
+	 * @var array
+	 */
+	private $additionalHeader;
+
+
 	/**
 	 * BeezUp constructor.
 	 *
@@ -102,7 +109,7 @@ class BeezUp extends CSVPluginGenerator
 	}
 
 	/**
-	 * @param VariationElasticSearchScrollRepositoryContract $resultData
+	 * @param VariationElasticSearchScrollRepositoryContract $elasticSearch
 	 * @param array $formatSettings
 	 * @param array $filter
 	 */
@@ -115,7 +122,9 @@ class BeezUp extends CSVPluginGenerator
         $settings = $this->arrayHelper->buildMapFromObjectList($formatSettings, 'key', 'value');
         $this->setDelimiter(self::DELIMITER);
 
-        $header = $this->setHeader();
+        $this->additionalHeader = $this->propertyHelper->getPropertyBasedHeader();
+        $header = array_merge($this->getHeader(), $this->additionalHeader);
+        $this->addCSVContent($header);
 
         if($elasticSearch instanceof VariationElasticSearchScrollRepositoryContract)
         {
@@ -140,12 +149,6 @@ class BeezUp extends CSVPluginGenerator
 
                 if(is_array($resultList['documents']) && count($resultList['documents']) > 0)
                 {
-                    $additionalHeader = $this->propertyHelper->buildPropertyData($resultList['documents']);
-
-                    // combine hard coded headers with property based headers
-                    $header = array_merge($header, $additionalHeader);
-                    $this->addCSVContent($header);
-
                     foreach($resultList['documents'] as $variation)
                     {
                         if($lines == $filter['limit'])
@@ -183,7 +186,7 @@ class BeezUp extends CSVPluginGenerator
 	/**
 	 * @return array
 	 */
-	private function setHeader()
+	private function getHeader()
 	{
 		$header = [
 			'Produkt ID',
@@ -286,16 +289,8 @@ class BeezUp extends CSVPluginGenerator
 			'ID'                    =>  $variation['data']['item']['id'],
 		];
 
-		$data = $this->propertyHelper->addPropertyData($data, $variation['id']);
-
-		// convert null to a string without length
-		foreach($data as $key => $value)
-		{
-			if(is_null($value))
-			{
-				$data[$key] = (string)$value;
-			}
-		}
+		$data = array_merge($data, $this->additionalHeader);
+		$data = $this->propertyHelper->addPropertyData($data, $variation);
 
 		$this->addCSVContent(array_values($data));
 	}
