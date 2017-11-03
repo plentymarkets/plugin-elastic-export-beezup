@@ -1,5 +1,10 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.0.17 (2017-11-03)
+
+### Behoben
+- Durch einen Fehler wurden Merkmale vom Typ Auswahl nicht korrekt exportiert.
+
 ## v1.0.16 (2017-09-18)
 
 ### Behoben

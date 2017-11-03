@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.0.17 (2017-11-03)
+
+### Fixed
+- An issue was fixed which caused properties of type selection not to be exported.
+
 ## v1.0.16 (2017-09-18)
 
 ### Fixed
