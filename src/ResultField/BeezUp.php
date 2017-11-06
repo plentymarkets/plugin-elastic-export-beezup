@@ -106,11 +106,6 @@ class BeezUp extends ResultFields
             exit();
         }
 
-        if($reference != -1)
-        {
-            $fields[1][] = $imageMutator;
-        }
-
         return $fields;
     }
 
