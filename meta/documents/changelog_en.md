@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## 1.0.18 (2017-11-08)
+
+### Fixed
+- An issue was fixed which caused the connection to elasticsearch to break.
+
 ## v1.0.17 (2017-11-03)
 
 ### Fixed

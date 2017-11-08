@@ -128,6 +128,8 @@ class BeezUp extends CSVPluginGenerator
 
         if($elasticSearch instanceof VariationElasticSearchScrollRepositoryContract)
         {
+        	$elasticSearch->setNumberOfDocumentsPerShard(250);
+        	
             $limitReached = false;
             $lines = 0;
 
