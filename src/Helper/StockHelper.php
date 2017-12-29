@@ -4,9 +4,16 @@ namespace ElasticExportBeezUp\Helper;
 
 use Plenty\Modules\StockManagement\Stock\Contracts\StockRepositoryContract;
 use Plenty\Repositories\Models\PaginatedResult;
+use Plenty\Modules\Helper\Models\KeyValue;
 
 class StockHelper
 {
+	private $stockBuffer = 0;
+
+	private $stockForVariationsWithoutStockLimitation = null;
+
+	private $stockForVariationsWithoutStockAdministration = null;
+	
 	/**
 	 * Get stock informations that depend on stock settings and stock volume
 	 * ($variationAvailable, $stock)
@@ -23,7 +30,7 @@ class StockHelper
 		if($stockRepositoryContract instanceof StockRepositoryContract)
 		{
 			$stockRepositoryContract->setFilters(['variationId' => $item['id']]);
-			$stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['stockNet'],1,1);
+			$stockResult = $stockRepositoryContract->listStockByWarehouseType('sales',['*'],1,1);
 			if($stockResult instanceof PaginatedResult)
 			{
 				$stockList = $stockResult->getResult();
@@ -37,19 +44,35 @@ class StockHelper
 
 		if($item['data']['variation']['stockLimitation'] == 2)
 		{
+			if(!is_null($this->stockForVariationsWithoutStockAdministration))
+			{
+				$stock = $this->stockForVariationsWithoutStockAdministration;
+			}
+			else
+			{
+				$stock = 999;
+			}
+			
 			$variationAvailable = 'Y';
-			$stock = 999;
 		}
 		elseif($item['data']['variation']['stockLimitation'] == 1 && $stockNet > 0)
 		{
-			$variationAvailable = 'Y';
 			if($stockNet > 999)
 			{
 				$stock = 999;
 			}
 			else
 			{
-				$stock = $stockNet;
+				$stock = $stockNet - $this->stockBuffer;
+			}
+
+			if($stock < 0)
+			{
+				$stock = 0;
+			}
+			else
+			{
+				$variationAvailable = 'Y';
 			}
 		}
 		elseif($item['data']['variation']['stockLimitation'] == 0)
@@ -65,6 +88,10 @@ class StockHelper
 				{
 					$stock = $stockNet;
 				}
+				elseif(!is_null($this->stockForVariationsWithoutStockLimitation))
+				{
+					$stock = $this->stockForVariationsWithoutStockLimitation;
+				}
 				else
 				{
 					$stock = 999;
@@ -77,5 +104,26 @@ class StockHelper
 			'variationAvailable'        =>  $variationAvailable,
 		);
 
+	}
+
+	/**
+	 * @param KeyValue $settings
+	 */
+	public function setAdditionalStockInformation(KeyValue $settings)
+	{
+		if(!is_null($settings->get('stockBuffer')) && $settings->get('stockBuffer') > 0)
+		{
+			$this->stockBuffer = $settings->get('stockBuffer');
+		}
+
+		if(!is_null($settings->get('stockForVariationsWithoutStockAdministration')) && $settings->get('stockForVariationsWithoutStockAdministration') > 0)
+		{
+			$this->stockForVariationsWithoutStockAdministration = $settings->get('stockForVariationsWithoutStockAdministration');
+		}
+
+		if(!is_null($settings->get('stockForVariationsWithoutStockLimitation')) && $settings->get('stockForVariationsWithoutStockLimitation') > 0)
+		{
+			$this->stockForVariationsWithoutStockLimitation = $settings->get('stockForVariationsWithoutStockLimitation');
+		}
 	}
 }

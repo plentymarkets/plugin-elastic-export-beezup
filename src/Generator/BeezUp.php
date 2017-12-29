@@ -124,6 +124,7 @@ class BeezUp extends CSVPluginGenerator
 
         $this->additionalHeader = $this->propertyHelper->getPropertyBasedHeader();
         $header = array_merge($this->getHeader(), $this->additionalHeader);
+        $this->stockHelper->setAdditionalStockInformation($settings);
         $this->addCSVContent($header);
 
         if($elasticSearch instanceof VariationElasticSearchScrollRepositoryContract)
