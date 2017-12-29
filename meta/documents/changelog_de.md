@@ -1,5 +1,10 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.1.0 (2017-12-28)
+
+### Hinzugefügt
+- Der StockHelper berücksichtigt die neuen Felder "Bestandspuffer", "Bestand für Varianten ohne Bestandsbeschränkung" und "Bestand für Varianten ohne Bestandsführung".
+
 ## 1.0.18 (2017-10-08)
 
 ### Behoben

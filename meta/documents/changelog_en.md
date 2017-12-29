@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.1.0 (2017-12-28)
+
+### Added
+- The StockHelper takes the new fields "Stockbuffer", "Stock for variations without stock limitation" and "Stock for variations with not stock administration" into account.
+
 ## 1.0.18 (2017-11-08)
 
 ### Fixed
