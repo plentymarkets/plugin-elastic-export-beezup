@@ -1,5 +1,15 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.1.2 (2018-02-16)
+
+### Changed
+- Updated plugin short description.
+
+## v1.1.1 (2018-02-16)
+
+### Geändert
+- Plugin-Kurzbeschreibung wurde angepasst.
+
 ## v1.1.0 (2017-12-28)
 
 ### Hinzugefügt
