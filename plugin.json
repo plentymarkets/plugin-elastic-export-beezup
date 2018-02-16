@@ -14,10 +14,10 @@
   "pluginIcon": "icon_plugin_md.png",
   "price": 0.00,
   "shortDescription": {
-    "de": "Das Plugin ElasticExportBeezUp fügt das Datenformat BeezUp-Plugin zum Elastischen Export hinzu.",
-    "en": "This plugin ElasticExportBeezUp adds the format BeezUp-Plugin to the Elastic Export."
+    "de": "Die Integration des Datenformats Beezup-Plugin ermöglicht die Artikeldatenübertragung zum Preisportal Beezup-Plugin über den elastischen Export.",
+    "en": "The integration of the data format Beezup-Plugin enables the transfer of item data to the price search engine Beezup via the elastic export."
   },
   "categories": ["3523"],
-  "version": "1.1.0",
+  "version": "1.1.1",
   "require": ["ElasticExport"]
 }
