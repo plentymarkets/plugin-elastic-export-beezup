@@ -28,7 +28,7 @@ The following table lists details for settings, format settings and recommended 
 | Order referrer                                    | Choose the order referrer that should be assigned during the order import. |
 | Stockbuffer                                       | The stock buffer for variations with the limitation to the net stock. |
 | Stock for variations without stock limitation     | The stock for variations without stock limitation. |
-| Stock for variations without stock administration | The stock for variations without stock administration.. |
+| Stock for variations without stock administration | The stock for variations without stock administration. |
 | Offer price                                       | This option is not relevant for this format. |
 | VAT note                                          | This option is not relevant for this format. |
 
@@ -41,7 +41,7 @@ The following table lists details for settings, format settings and recommended 
 | MPN                 | **Content**: The **model** of the variation. |
 | EAN                 | **Content**: According to the format setting **Barcode**. |
 | Marke               | **Content**: The **name of the manufacturer** of the item. The **external name** in the menu **Settings » Items » Manufacturer** will be preferred if existing. |
-| Produktname         | **Content**: According to the format setting **item name**. |
+| Produktname         | **Content**: According to the format setting **Item name**. |
 | Produktbeschreibung | **Content**: According to the format setting **Description**. |
 | Preis inkl. MwSt.   | **Content**: The **sales price** of the variation.. |
 | UVP                 | **Content**: If the **RRP** is activated in the format setting and is higher than the **sales price**, the **RRP** will be exported. |
@@ -61,7 +61,7 @@ The following table lists details for settings, format settings and recommended 
 | Kategorie 4         | **Content**: The name of the category level 4. |
 | Kategorie 5         | **Content**: The name of the category level 5. |
 | Kategorie 6         | **Content**: The name of the category level 6. |
-| Farbe               | **Content**: The attribute value of an attribute which is linked to **Amazon** with **Color**. |
+| Farbe               | **Content**: The attribute value of an attribute which is linked to **Amazon** with **Colour**. |
 | Größe               | **Content**: The attribute value of an attribute which is linked to **Amazon** with **Size**. |
 | Gewicht             | **Content**: The **weight** of the variation. |
 | Grundpreis          | **Content**: The **base price information**. The format is "price / unit". (Example: 10,00 EUR / kilogram) |
