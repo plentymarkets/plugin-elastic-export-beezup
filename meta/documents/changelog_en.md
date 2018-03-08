@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.1.2 (2018-03-08)
+
+### Fixed
+- Tables were adjusted.
+
 ## v1.1.1 (2018-02-16)
 
 ### Changed
