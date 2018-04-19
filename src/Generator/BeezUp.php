@@ -4,6 +4,7 @@ namespace ElasticExportBeezUp\Generator;
 
 use ElasticExport\Helper\ElasticExportPriceHelper;
 use ElasticExport\Helper\ElasticExportStockHelper;
+use ElasticExport\Services\FiltrationService;
 use ElasticExportBeezUp\Helper\AttributeHelper;
 use ElasticExportBeezUp\Helper\ImageHelper;
 use ElasticExportBeezUp\Helper\ItemHelper;
@@ -74,12 +75,15 @@ class BeezUp extends CSVPluginGenerator
 	 */
 	private $stockHelper;
 
+    /**
+     * @var FiltrationService
+     */
+    private $filtrationService;
 
 	/**
 	 * @var array
 	 */
 	private $additionalHeader;
-
 
 	/**
 	 * BeezUp constructor.
@@ -120,6 +124,8 @@ class BeezUp extends CSVPluginGenerator
 		$this->elasticExportPriceHelper = pluginApp(ElasticExportPriceHelper::class);
 
         $settings = $this->arrayHelper->buildMapFromObjectList($formatSettings, 'key', 'value');
+        $this->filtrationService = pluginApp(FiltrationService::class, [$settings, $filter]);
+        
         $this->setDelimiter(self::DELIMITER);
 
         $this->additionalHeader = $this->propertyHelper->getPropertyBasedHeader();
@@ -160,7 +166,7 @@ class BeezUp extends CSVPluginGenerator
                             break;
                         }
 
-						if($this->elasticExportStockHelper->isFilteredByStock($variation, $filter) === true)
+						if($this->filtrationService->filter($variation))
 						{
 							continue;
 						}
