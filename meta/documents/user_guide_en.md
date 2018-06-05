@@ -100,6 +100,6 @@ _Tab. 1: Settings for the data format **BeezUp-Plugin**_
 
 > If you want to export items to BeezUP which are linked to properties, the export file is automatically extended by further columns for these properties. The columns in the export file have the _Webshop_ name of the property.
 
-## 5 License
+## 4 License
 
 This project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE.- find further information in the [LICENSE.md](https://github.com/plentymarkets/plugin-elastic-export-beeup/blob/master/LICENSE.md).
