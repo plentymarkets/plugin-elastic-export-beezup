@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.1.5 (2018-06-05)
+
+### Changed
+- The table in the user guide which contains information about format settings was extended.
+
 ## v1.1.4 (2018-04-30)
 
 ### Changed
