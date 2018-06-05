@@ -99,6 +99,6 @@ _Tab. 1: Einstellungen für das Datenformat **BeezUp-Plugin**_
 
 > Wenn Artikel, die Sie zu BeezUP exportieren möchten, mit Merkmalen verknüpft sind, wird die Exportdatei automatisch um zusätzliche Spalten für diese Merkmale erweitert. Die Spalten in der Exportdatei haben den _Webshop_-Namen des Merkmals.
 
-## 5 Lizenz
+## 4 Lizenz
 
 Das gesamte Projekt unterliegt der GNU AFFERO GENERAL PUBLIC LICENSE – weitere Informationen finden Sie in der [LICENSE.md](https://github.com/plentymarkets/plugin-elastic-export-beezup/blob/master/LICENSE.md).
