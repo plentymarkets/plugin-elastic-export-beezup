@@ -5,7 +5,10 @@
   "type": "export",
   "serviceProvider": "ElasticExportBeezUp\\ElasticExportBeezUpServiceProvider",
   "author": "plentymarkets GmbH",
-  "marketplaceName": "BeezUp",
+  "marketplaceName": {
+    "de": "BeezUp",
+    "en": "BeezUp"
+  },
   "authorIcon": "icon_author_xs.png",
   "license": "GNU AFFERO GENERAL PUBLIC LICENSE Version 3, 19 November 2007",
   "pluginIcon": "icon_plugin_md.png",
