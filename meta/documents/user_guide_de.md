@@ -11,7 +11,7 @@ BeezUP ist ein Tool zur Verwaltung und Optimierung der Präsentation Ihrer Artik
 
 Mit der Installation dieses Plugins erhalten Sie das Exportformat **BeezUp-Plugin**, mit dem Sie Daten über den elastischen Export zu BeezUP übertragen. Um dieses Format für den elastischen Export nutzen zu können, installieren Sie zunächst das Plugin **Elastic Export** aus dem plentyMarketplace, wenn noch nicht geschehen. 
 
-Sobald beide Plugins in Ihrem System installiert sind, kann das Exportformat **BeezUp-Plugin** erstellt werden. Mehr Informationen finden Sie auch auf der Handbuchseite [Daten exportieren](https://knowledge.plentymarkets.com/basics/datenaustausch/export-import/daten-exportieren#30).
+Sobald beide Plugins in Ihrem System installiert sind, kann das Exportformat **BeezUp-Plugin** erstellt werden. Mehr Informationen finden Sie auch auf der Handbuchseite [Daten für Preissuchmaschinen exportieren](https://knowledge.plentymarkets.com/basics/datenaustausch/export-import/daten-exportieren#30).
 
 Neues Exportformat erstellen:
 
