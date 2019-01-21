@@ -17,7 +17,7 @@
     "de": "Die Integration des Datenformats Beezup-Plugin ermöglicht die Artikeldatenübertragung zum Preisportal Beezup-Plugin über den elastischen Export.",
     "en": "The integration of the data format Beezup-Plugin enables the transfer of item data to the price search engine Beezup via the elastic export."
   },
-  "categories": ["3523"],
+  "categories": ["3880"],
   "version": "1.1.7",
   "require": ["ElasticExport"]
 }
