@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.1.8 (2019-10-09)
+
+### Changed
+- The user guide was updated (changed form of address, corrected broken links).
+
 ## v1.1.7 (2019-01-21)
 
 ### Changed

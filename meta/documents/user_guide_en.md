@@ -5,20 +5,20 @@
 
 ## 1 Registering with BeezUP
 
-BeezUP helps you to manage and optimise the presentation of your items in price comparison portals, on markets and with affiliate services. For further information about this service, refer to the [BeezUp](https://knowledge.plentymarkets.com/en/omni-channel/online-store/setting-up-clients/extras/beezup) page of the manual. In order to set up the plugin in plentymarkets, register as seller with BeezUP first.
+BeezUP helps you to manage and optimise the presentation of your items in price comparison portals, on markets and with affiliate services. For further information about this service, refer to the [BeezUp](https://knowledge.plentymarkets.com/en/online-store/online-store/extras/beezup) page of the manual. In order to set up the plugin in plentymarkets, register as seller with BeezUP first.
 
 ## 2 Setting up the data format BeezUp-Plugin in plentymarkets
 
 By installing this plugin you will receive the export format **BeezUp-Plugin**. Use this format to exchange data between plentymarkets and BeezUP. It is required to install the Plugin **Elastic Export** from the plentyMarketplace first before you can use the format **BeezUp-Plugin** in plentymarkets.
 
-Once both plugins are installed, you can create the export format **BeezUp-Plugin**. Refer to the [Elastic Export](https://knowledge.plentymarkets.com/en/basics/data-exchange/elastic-export) page of the manual for further details about the individual format settings.
+Once both plugins are installed, you can create the export format **BeezUp-Plugin**. Refer to the [Elastic Export](https://knowledge.plentymarkets.com/en/data/exporting-data/elastic-export) page of the manual for further details about the individual format settings.
 
 Creating a new export format:
 
 1. Go to **Data » Elastic export**.
 2. Click on **New export**.
 3. Carry out the settings as desired. Pay attention to the information given in table 1.
-4. **Save** the settings.
+4. **Save** the settings.<br/>
 → The export format will be given an ID and it will appear in the overview within the **Exports** tab.
 
 The following table lists details for settings, format settings and recommended item filters for the format **BeezUp-Plugin**.
@@ -40,8 +40,8 @@ The following table lists details for settings, format settings and recommended 
 | **Product URL**                                       | Choose which URL should be transferred to BeezUp, the item's URL or the variation's URL. Variation SKUs can only be transferred in combination with the Ceres store. |
 | **Client**                                            | Select a client. This setting is used for the URL structure. |
 | **URL parameter**                                     | Enter a suffix for the product URL if this is required for the export. If you have activated the **transfer** option for the product URL further up, then this character string is added to the product URL. |
-| **Order referrer**                                    | Select the order referrer that should be assigned during the order import from the drop-down list. |
-| **Marketplace account**                               | Select the marketplace account from the drop-down list. The selected referrer is added to the product URL so that sales can be analysed later. |
+| **Order referrer**                                    | Select the order referrer that should be assigned during the order import from the drop-down list. The selected referrer is added to the product URL so that sales can be analysed later. |
+| **Marketplace account**                               | Select the marketplace account from the drop-down list. |
 | **Language**                                          | Select the language from the drop-down list. |
 | **Item name**                                         | Select **Name 1**, **Name 2**, or **Name 3**. These names are saved in the **Texts** tab of the item.<br/> Enter a number into the **Maximum number of characters (def. text)** field if desired. This specifies how many characters are exported for the item name. |
 | **Preview text**                                      | Select the text that you want to transfer as preview text.<br/> Enter a number into the **Maximum number of characters (def. text)** field if desired. This specifies how many characters should be exported for the item name. Activate the option **Remove HTML tags** if you want HTML tags to be removed during the export.<br/> If you only want to allow specific HTML tags to be exported, then enter these tags into the field **Permitted HTML tags, separated by comma (def. text)**. Use commas to separate multiple tags. |
@@ -59,7 +59,7 @@ The following table lists details for settings, format settings and recommended 
 | **RRP**                                               | Activate to transfer the RRP. |
 | **Shipping costs**                                    | Activate this option if you want to use the shipping costs that are saved in a configuration. If this option is activated, then you are able to select the configuration and the payment method from the drop-down lists.<br/> Activate the option **Transfer flat rate shipping charge** if you want to use a fixed shipping charge. If this option is activated, you must enter a value in the line underneath. |
 | **VAT note**                                          | This option does not affect this format. |
-| **Overwrite item availability**                       | Activate the **overwrite** option and enter item availabilities into the fields **1** to **10**. The fields represent the IDs of the availabilities. This overwrites the item avaialbilities that are saved in the menu **System » Item » Availability**. | 
+| **Overwrite item availability**                       | Activate the **overwrite** option and enter item availabilities into the fields **1** to **10**. The fields represent the IDs of the availabilities. This overwrites the item avaialbilities that are saved in the **Setup » Item » Availability** menu. | 
 
 _Tab. 1: Settings for the data format **BeezUp-Plugin**_
 
@@ -71,7 +71,7 @@ _Tab. 1: Settings for the data format **BeezUp-Plugin**_
 | Artikel Nr          | The **variation number** of the variation. |
 | MPN                 | The **model** of the variation. |
 | EAN                 | According to the format setting **Barcode**. |
-| Marke               | The **name of the manufacturer** of the item. The **external name** in the menu **Settings » Items » Manufacturer** will be preferred if existing. |
+| Marke               | The **name of the manufacturer** of the item. The **external name** in the menu **Setup » Items » Manufacturer** will be preferred if existing. |
 | Produktname         | According to the format setting **Item name**. |
 | Produktbeschreibung | According to the format setting **Description**. |
 | Preis inkl. MwSt.   | The **sales price** of the variation.. |
@@ -85,7 +85,7 @@ _Tab. 1: Settings for the data format **BeezUp-Plugin**_
 | Lieferkosten        | According to the format setting **Shipping costs**. |
 | Auf Lager           | Defines wether the variation has **stock**, depending on **stock_detail**. |
 | Lagerbestand        | The **net stock of the variation**. The stock **999** will be exported for items which have no stock limitation. |
-| Lieferfrist         | The **name of the item availability** within **Settings » Item » Item availability** or the translation according to the format setting **Item availability**. |
+| Lieferfrist         | The **name of the item availability** within **Setup » Item » Item availability** or the translation according to the format setting **Item availability**. |
 | Kategorie 1         | The name of the category level 1. |
 | Kategorie 2         | The name of the category level 2. |
 | Kategorie 3         | The name of the category level 3. |
