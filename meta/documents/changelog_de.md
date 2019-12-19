@@ -1,5 +1,10 @@
 # Release Notes für Elastic Export BeezUp
 
+## v1.1.9 (2019-12-19)
+
+### Behoben
+- Es war möglich durch Merkmale mehrere Spalten mit der selben Bezeichnung zu generieren.
+
 ## v1.1.8 (2019-10-09)
 
 ### Geändert
