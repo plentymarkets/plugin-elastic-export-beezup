@@ -77,9 +77,10 @@ class PropertyHelper
 	}
 
 	/**
+     * @param array $defaultHeader
 	 * @return array
 	 */
-	public function getPropertyBasedHeader(): array
+	public function getPropertyBasedHeader(array $defaultHeader): array
 	{
 		$list = [];
 
@@ -100,10 +101,15 @@ class PropertyHelper
 				 */
 				$propertyName = $this->propertyNameRepository->findOne($propertyMarketReference->propertyId, 'de');
 
-				if($propertyName instanceof PropertyName && !is_null($propertyName))
-				{
-					$list[] = $propertyName->name;
+				if (!$propertyName instanceof PropertyName || is_null($propertyName)) {
+				    continue;
 				}
+
+				if (in_array($propertyName->name, $defaultHeader)) {
+				    continue;
+                }
+				
+                $list[] = $propertyName->name;
 			}
 		}
 

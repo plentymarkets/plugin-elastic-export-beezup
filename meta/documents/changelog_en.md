@@ -1,5 +1,10 @@
 # Release Notes for Elastic Export BeezUp
 
+## v1.1.9 (2019-12-19)
+
+### Fixed
+- It was possible to generate multiple colums with the same label through properties.
+
 ## v1.1.8 (2019-10-09)
 
 ### Changed
