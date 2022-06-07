@@ -11,6 +11,6 @@ This plugin uses the Elastic Export. Therefore, you also need the **Elastic expo
 Both methods to set up Awin in plentymarkets are described in the <a href="https://knowledge.plentymarkets.com/en-gb/manual/main/markets/beezup.html" target="_blank">plentymarkets manual</a>.
 </div>
 
-## 4 License
+## License
 
 This project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE.- find further information in the [LICENSE.md](https://github.com/plentymarkets/plugin-elastic-export-beezup/blob/master/LICENSE.md).
