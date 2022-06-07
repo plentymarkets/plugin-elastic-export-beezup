@@ -18,8 +18,11 @@
     "en": "The integration of the data format Beezup-Plugin enables the transfer of item data to the price search engine Beezup via the elastic export."
   },
   "categories": ["3880"],
-  "version": "1.1.10",
+  "version": "1.1.11",
   "require": {
     "ElasticExport": ">= 1.6.6"
-  }
+  },
+  "platform": {
+    "php": ">=7.3 <8.1"
+}
 }
